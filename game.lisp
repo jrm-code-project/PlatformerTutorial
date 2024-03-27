@@ -5,6 +5,19 @@
 (defclass game ()
   ((steps :initform (cons 0 nil) :accessor steps)))
 
+(defgeneric render-game! (renderer game)
+  (:method :before (renderer game)
+    ;; Clear any old image
+    (sdl2:set-render-draw-color renderer #xff #xff #xff #xff)
+    (sdl2:render-clear renderer))
+
+  (:method (renderer game)
+    nil)
+
+  (:method :after (renderer game)
+    ;; display image
+    (sdl2:render-present renderer)))
+
 (defgeneric game-step! (game dticks)
   (:method ((game game) dticks)
     (sb-ext:atomic-incf (car (steps game)))))

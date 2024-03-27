@@ -2,19 +2,6 @@
 
 (in-package "TUTORIAL")
 
-(defgeneric render-game! (renderer game)
-  (:method :before (renderer game)
-    ;; Clear any old image
-    (sdl2:set-render-draw-color renderer #xff #xff #xff #xff)
-    (sdl2:render-clear renderer))
-
-  (:method (renderer game)
-    nil)
-
-  (:method :after (renderer game)
-    ;; display image
-    (sdl2:render-present renderer)))
-
 (defconstant +ticks-per-second+ 1000)
 (defconstant +frames-per-second+ 60)
 (defconstant +ticks-per-frame+ (/ +ticks-per-second+ +frames-per-second+))
