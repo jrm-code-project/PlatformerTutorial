@@ -2,18 +2,18 @@
 
 (in-package "TUTORIAL")
 
-(defun render! (renderer)
-  ;; Clear any old image
-  (sdl2:set-render-draw-color renderer #xff #xff #xff #xff)
-  (sdl2:render-clear renderer)
+(defgeneric render-game! (renderer game)
+  (:method :before (renderer game)
+    ;; Clear any old image
+    (sdl2:set-render-draw-color renderer #xff #xff #xff #xff)
+    (sdl2:render-clear renderer))
 
-  ;; Draw the new image
-  (sdl2:set-render-draw-color renderer #xff #x00 #x00 #xff)
-  (sdl2:with-rects ((rect 100 200 200 50))
-    (sdl2:render-fill-rect renderer rect))
+  (:method (renderer game)
+    nil)
 
-  ;; Send it to the screen
-  (sdl2:render-present renderer))
+  (:method :after (renderer game)
+    ;; display image
+    (sdl2:render-present renderer)))
 
 (defconstant +ticks-per-second+ 1000)
 (defconstant +frames-per-second+ 60)
@@ -34,7 +34,7 @@
                     (this-frame (floor tick +ticks-per-frame+))
                     (this-title (floor tick +ticks-per-title+)))
                (cond ((> this-frame last-frame)
-                      (render! renderer)
+                      (render-game! renderer game)
                       (setq last-frame this-frame)
                       (incf frame-count))
                      ((> this-title last-title)
@@ -72,6 +72,33 @@
      (sdl2:with-init (:video)
        (main-window game)))))
 
+(defclass bouncing-rectangle (game)
+  ((x-pos :initform 100 :accessor get-x)
+   (y-pos :initform 100 :accessor get-y)
+   (x-vel :initform .25 :accessor get-x-vel)
+   (y-vel :initform .25 :accessor get-y-vel)
+   (width :initform 200 :reader get-rect-width)
+   (height :initform 50 :reader get-rect-height)))
+
+(defmethod render-game! (renderer (game bouncing-rectangle))
+  (sdl2:set-render-draw-color renderer #xff #x00 #x00 #xff)
+  (sdl2:with-rects ((rect (floor (get-x game))
+                          (floor (get-y game))
+                          (get-rect-width game)
+                          (get-rect-height game)))
+    (sdl2:render-fill-rect renderer rect)))
+
+(defmethod game-step! ((game bouncing-rectangle) dticks)
+  (let* ((x-pos* (+ (get-x game) (* dticks (get-x-vel game))))
+         (y-pos* (+ (get-y game) (* dticks (get-y-vel game)))))
+    (cond ((< x-pos* 0) (setf (get-x-vel game) .25))
+          ((> (+ x-pos* (get-rect-width game)) 800) (setf (get-x-vel game) -.25))
+          (t (setf (get-x game) x-pos*)))
+    (cond ((< y-pos* 0) (setf (get-y-vel game) .25))
+          ((> (+ y-pos* (get-rect-height game)) 600) (setf (get-y-vel game) -.25))
+          (t (setf (get-y game) y-pos*)))
+    (call-next-method)))
+
 (defun main ()
-  (let ((game (make-instance 'game)))
+  (let ((game (make-instance 'bouncing-rectangle)))
     (run game)))
