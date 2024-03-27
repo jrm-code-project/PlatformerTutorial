@@ -2,6 +2,8 @@
 
 (defsystem "tutorial"
   :depends-on ("sdl2")
-  :components ((:file "package")
-               (:file "tutorial" :depends-on ("package"))))
+  :components ((:file "game" :depends-on ("package"))
+               (:file "package")
+               (:file "tutorial" :depends-on ("game"
+                                              "package"))))
 

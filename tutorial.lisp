@@ -1,5 +1,5 @@
 ;;; -*- Lisp -*-
-    
+
 (in-package "TUTORIAL")
 
 (defun render! (renderer)
@@ -21,7 +21,7 @@
 (defconstant +titles-per-second+ 1)
 (defconstant +ticks-per-title+ (/ +ticks-per-second+ +titles-per-second+))
 
-(defun main-event-loop (window renderer)
+(defun main-event-loop (game window renderer)
   (let ((start-tick (sdl2:get-ticks))
         (last-frame 0)
         (last-title 0)
@@ -39,9 +39,12 @@
                       (incf frame-count))
                      ((> this-title last-title)
                       (sdl2:set-window-title window
-                                             (format nil "Platformer, frame rate: ~d" frame-count))
+                                             (format nil "Platformer, frame rate: ~d, game rate: ~d"
+                                                     frame-count
+                                                     (car (steps game))))
                       (setq last-title this-title)
-                      (setq frame-count 0))
+                      (setq frame-count 0)
+                      (sb-ext:atomic-decf (car (steps game)) (car (steps game))))
                      (t (sleep 0.002)))))
 
       (:keydown (:keysym keysym)
@@ -54,14 +57,21 @@
       (:quit () t)
       )))
 
-(defun main-window ()
+(defun main-window (game)
   (sdl2:with-window (window
                      :w 800
                      :h 600
                      :flags '(:shown))
     (sdl2:with-renderer (renderer window :index -1 :flags '(:accelerated))
-      (main-event-loop window renderer))))
+      (main-event-loop game window renderer))))
+
+(defun run (game)
+  (call-with-game-loop
+   game
+   (lambda ()
+     (sdl2:with-init (:video)
+       (main-window game)))))
 
 (defun main ()
-  (sdl2:with-init (:video)
-    (main-window)))
+  (let ((game (make-instance 'game)))
+    (run game)))
