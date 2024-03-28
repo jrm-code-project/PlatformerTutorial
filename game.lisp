@@ -5,16 +5,36 @@
 (defclass game ()
   ((steps :initform (cons 0 nil) :accessor steps)))
 
-(defgeneric render-game! (renderer game)
-  (:method :before (renderer game)
+(defgeneric call-with-surfaces (game receiver)
+  (:method (game receiver)
+    (funcall receiver nil)))
+
+(defmacro with-surfaces ((surfaces game) &body body)
+  `(CALL-WITH-SURFACES
+    ,game
+    (LAMBDA (,surfaces)
+      ,@body)))
+
+(defgeneric call-with-textures (game surfaces renderer receiver)
+  (:method (game surfaces renderer receiver)
+    (funcall receiver nil)))
+
+(defmacro with-textures ((textures game surfaces renderer) &body body)
+  `(CALL-WITH-TEXTURES
+    ,game ,surfaces ,renderer
+    (LAMBDA (,textures)
+      ,@body)))
+
+(defgeneric render-game! (renderer game textures)
+  (:method :before (renderer game textures)
     ;; Clear any old image
     (sdl2:set-render-draw-color renderer #xff #xff #xff #xff)
     (sdl2:render-clear renderer))
 
-  (:method (renderer game)
+  (:method (renderer game textures)
     nil)
 
-  (:method :after (renderer game)
+  (:method :after (renderer game textures)
     ;; display image
     (sdl2:render-present renderer)))
 
@@ -22,6 +42,7 @@
   (:method ((game game) dticks)
     (sb-ext:atomic-incf (car (steps game)))))
 
+(defconstant +ticks-per-second+ 1000)
 (defconstant +steps-per-second+ 200)
 (defconstant +ticks-per-step+ (/ +ticks-per-second+ +steps-per-second+))
 
@@ -52,4 +73,8 @@
       (when thread
         (sb-ext:atomic-incf (car thread-control-cell))
         (bordeaux-threads:join-thread thread)))))
-    
+
+(defmacro with-game-loop ((game) &body body)
+  `(CALL-WITH-GAME-LOOP
+    ,game
+    (LAMBDA () ,@body)))

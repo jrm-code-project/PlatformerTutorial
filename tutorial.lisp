@@ -2,17 +2,18 @@
 
 (in-package "TUTORIAL")
 
-(defconstant +ticks-per-second+ 1000)
 (defconstant +frames-per-second+ 60)
 (defconstant +ticks-per-frame+ (/ +ticks-per-second+ +frames-per-second+))
 (defconstant +titles-per-second+ 1)
 (defconstant +ticks-per-title+ (/ +ticks-per-second+ +titles-per-second+))
 
-(defun main-event-loop (game window renderer)
+(defun main-event-loop (game window renderer textures)
   (let ((start-tick (sdl2:get-ticks))
         (last-frame 0)
         (last-title 0)
         (frame-count 0))
+    (format t "~&~s~%" textures)
+    (force-output)
 
     (sdl2:with-event-loop (:method :poll)
 
@@ -21,7 +22,7 @@
                     (this-frame (floor tick +ticks-per-frame+))
                     (this-title (floor tick +ticks-per-title+)))
                (cond ((> this-frame last-frame)
-                      (render-game! renderer game)
+                      (render-game! renderer game textures)
                       (setq last-frame this-frame)
                       (incf frame-count))
                      ((> this-title last-title)
@@ -44,21 +45,22 @@
       (:quit () t)
       )))
 
-(defun main-window (game)
+(defun main-window (game surfaces)
   (sdl2:with-window (window
                      :w 800
                      :h 600
                      :flags '(:shown))
     (sdl2:with-renderer (renderer window :index -1 :flags '(:accelerated))
-      (main-event-loop game window renderer))))
+      (with-textures (textures game surfaces renderer)
+        (main-event-loop game window renderer textures)))))
 
 (defun run (game)
-  (call-with-game-loop
-   game
-   (lambda ()
-     (sdl2:with-init (:video)
-       (main-window game)))))
+  (with-surfaces (surfaces game)
+    (with-game-loop (game)
+      (sdl2:with-init (:video)
+        (main-window game surfaces)))))
 
+#||
 (defclass bouncing-rectangle (game)
   ((x-pos :initform 100 :accessor get-x)
    (y-pos :initform 100 :accessor get-y)
@@ -67,7 +69,7 @@
    (width :initform 200 :reader get-rect-width)
    (height :initform 50 :reader get-rect-height)))
 
-(defmethod render-game! (renderer (game bouncing-rectangle))
+(defmethod render-game! (renderer (game bouncing-rectangle) textures)
   (sdl2:set-render-draw-color renderer #xff #x00 #x00 #xff)
   (sdl2:with-rects ((rect (floor (get-x game))
                           (floor (get-y game))
@@ -85,7 +87,34 @@
           ((> (+ y-pos* (get-rect-height game)) 600) (setf (get-y-vel game) -.25))
           (t (setf (get-y game) y-pos*)))
     (call-next-method)))
+||#
+
+(defclass player-sprite (game)
+  ())
+
+(defmethod call-with-surfaces ((game player-sprite) receiver)
+  (let-surfaces ((player-sprites-surface (resource-pathname "player_sprites.png")))
+    (funcall receiver
+             `(:player ,player-sprites-surface))))
+
+(defmethod call-with-textures ((game player-sprite) surfaces renderer receiver)
+  (let-texture (renderer
+                (player-sprites-texture (getf surfaces :player)))
+    (funcall receiver
+             `(:player ,player-sprites-texture))))
+
+(defmethod render-game! (renderer (game player-sprite) textures)
+  (let ((sprites (getf textures :player)))
+    (sdl2:with-rects ((src 0
+                           0
+                           (sdl2:texture-width sprites)
+                           (sdl2:texture-height sprites))
+                      (dst 100
+                           100
+                           (sdl2:texture-width sprites)
+                           (sdl2:texture-height sprites)))
+      (sdl2:render-copy renderer sprites :source-rect src :dest-rect dst))))
 
 (defun main ()
-  (let ((game (make-instance 'bouncing-rectangle)))
+  (let ((game (make-instance 'player-sprite)))
     (run game)))
