@@ -12,8 +12,6 @@
         (last-frame 0)
         (last-title 0)
         (frame-count 0))
-    (format t "~&~s~%" textures)
-    (force-output)
 
     (sdl2:with-event-loop (:method :poll)
 
