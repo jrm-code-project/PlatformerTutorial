@@ -3,7 +3,7 @@
 (in-package "TUTORIAL")
 
 (defclass game ()
-  ((steps :initform (cons 0 nil) :accessor steps)))
+  ((steps   :initform (cons 0 nil) :accessor steps)))
 
 (defgeneric call-with-surfaces (game receiver)
   (:method (game receiver)
@@ -15,26 +15,26 @@
     (LAMBDA (,surfaces)
       ,@body)))
 
-(defgeneric call-with-textures (game surfaces renderer receiver)
+(defgeneric call-with-resources (game surfaces renderer receiver)
   (:method (game surfaces renderer receiver)
-    (funcall receiver nil)))
+    (funcall receiver nil nil)))
 
-(defmacro with-textures ((textures game surfaces renderer) &body body)
-  `(CALL-WITH-TEXTURES
+(defmacro with-resources (((textures sprite-sheets) game surfaces renderer) &body body)
+  `(CALL-WITH-RESOURCES
     ,game ,surfaces ,renderer
-    (LAMBDA (,textures)
+    (LAMBDA (,textures ,sprite-sheets)
       ,@body)))
 
-(defgeneric render-game! (renderer game textures)
-  (:method :before (renderer game textures)
+(defgeneric render-game! (renderer game textures sprite-sheets)
+  (:method :before (renderer game textures sprite-sheets)
     ;; Clear any old image
     (sdl2:set-render-draw-color renderer #xff #xff #xff #xff)
     (sdl2:render-clear renderer))
 
-  (:method (renderer game textures)
+  (:method (renderer game textures sprite-sheets)
     nil)
 
-  (:method :after (renderer game textures)
+  (:method :after (renderer game textures sprite-sheets)
     ;; display image
     (sdl2:render-present renderer)))
 

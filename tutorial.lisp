@@ -7,7 +7,7 @@
 (defconstant +titles-per-second+ 1)
 (defconstant +ticks-per-title+ (/ +ticks-per-second+ +titles-per-second+))
 
-(defun main-event-loop (game window renderer textures)
+(defun main-event-loop (game window renderer textures sprite-sheets)
   (let ((start-tick (sdl2:get-ticks))
         (last-frame 0)
         (last-title 0)
@@ -20,7 +20,7 @@
                     (this-frame (floor tick +ticks-per-frame+))
                     (this-title (floor tick +ticks-per-title+)))
                (cond ((> this-frame last-frame)
-                      (render-game! renderer game textures)
+                      (render-game! renderer game textures sprite-sheets)
                       (setq last-frame this-frame)
                       (incf frame-count))
                      ((> this-title last-title)
@@ -45,12 +45,12 @@
 
 (defun main-window (game surfaces)
   (sdl2:with-window (window
-                     :w 800
-                     :h 600
+                     :w (game-width)
+                     :h (game-height)
                      :flags '(:shown))
     (sdl2:with-renderer (renderer window :index -1 :flags '(:accelerated))
-      (with-textures (textures game surfaces renderer)
-        (main-event-loop game window renderer textures)))))
+      (with-resources ((textures sprite-sheets) game surfaces renderer)
+        (main-event-loop game window renderer textures sprite-sheets)))))
 
 (defun run (game)
   (with-surfaces (surfaces game)
@@ -87,32 +87,40 @@
     (call-next-method)))
 ||#
 
-(defclass player-sprite (game)
+(defclass player-sprites (game)
   ())
 
-(defmethod call-with-surfaces ((game player-sprite) receiver)
+(defmethod call-with-surfaces ((game player-sprites) receiver)
   (let-surfaces ((player-sprites-surface (resource-pathname "player_sprites.png")))
     (funcall receiver
              `(:player ,player-sprites-surface))))
 
-(defmethod call-with-textures ((game player-sprite) surfaces renderer receiver)
+(defmethod call-with-resources ((game player-sprites) surfaces renderer receiver)
   (let-texture (renderer
                 (player-sprites-texture (getf surfaces :player)))
-    (funcall receiver
-             `(:player ,player-sprites-texture))))
+    (let* ((textures `(:player ,player-sprites-texture))
+           (sprite-sheets (list (make-sprite-sheet (lambda (textures) (getf textures :player))
+                                                   textures
+                                                   #(:idle
+                                                     :running
+                                                     :jumping
+                                                     :falling
+                                                     :landing
+                                                     :hit
+                                                     :attack1
+                                                     :attack2
+                                                     :attack3)
+                                                   #(5 6 3 1 2 4 3 3 3)
+                                                   :baseline-offset 8))))
+      (funcall receiver textures sprite-sheets))))
 
-(defmethod render-game! (renderer (game player-sprite) textures)
-  (let ((sprites (getf textures :player)))
-    (sdl2:with-rects ((src 0
-                           0
-                           (sdl2:texture-width sprites)
-                           (sdl2:texture-height sprites))
-                      (dst 100
-                           100
-                           (sdl2:texture-width sprites)
-                           (sdl2:texture-height sprites)))
-      (sdl2:render-copy renderer sprites :source-rect src :dest-rect dst))))
+(defmethod render-game! (renderer (game player-sprites) textures sprite-sheets)
+  (render-sprite! renderer textures (car sprite-sheets) :idle 0 (scale 50) (scale 50) :flip? t)
+  (sdl2:set-render-draw-color renderer #xff #x00 #x00 #xff)
+  (sdl2:render-draw-line renderer (scale 20) (+ (scale 50) 1) (scale 80) (+ (scale 50) 1))
+  (sdl2:render-draw-line renderer (scale 50) (scale 50) (scale 50) (+ (scale 50) 10))
+  )
 
 (defun main ()
-  (let ((game (make-instance 'player-sprite)))
+  (let ((game (make-instance 'player-sprites)))
     (run game)))
