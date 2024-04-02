@@ -2,7 +2,14 @@
 
 (defsystem "tutorial"
   :depends-on ("sdl2" "sdl2-image")
-  :components ((:file "game" :depends-on ("package"
+  :components ((:file "animation" :depends-on ("package"
+                                               "parameters"
+                                               "macros"
+                                               "resource"
+                                               "texture"
+                                               "sprites"))
+               (:file "game" :depends-on ("animation"
+                                          "package"
                                           "parameters"
                                           "macros"
                                           "resource"
@@ -18,9 +25,12 @@
                                               "texture"))
                (:file "texture"  :depends-on ("package"
                                               "resource"))
-               (:file "tutorial" :depends-on ("game"
+               (:file "tutorial" :depends-on ("animation"
+                                              "game"
                                               "package"
                                               "parameters"
                                               "macros"
                                               "resource"
-                                              "texture"))))
+                                              "texture"
+                                              "utilities"))
+               (:file "utilities" :depends-on ("package"))))

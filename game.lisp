@@ -17,24 +17,24 @@
 
 (defgeneric call-with-resources (game surfaces renderer receiver)
   (:method (game surfaces renderer receiver)
-    (funcall receiver nil nil)))
+    (funcall receiver nil nil nil)))
 
-(defmacro with-resources (((textures sprite-sheets) game surfaces renderer) &body body)
+(defmacro with-resources (((resources) game surfaces renderer) &body body)
   `(CALL-WITH-RESOURCES
     ,game ,surfaces ,renderer
-    (LAMBDA (,textures ,sprite-sheets)
+    (LAMBDA (,resources)
       ,@body)))
 
-(defgeneric render-game! (renderer game textures sprite-sheets)
-  (:method :before (renderer game textures sprite-sheets)
+(defgeneric render-game! (renderer game resources)
+  (:method :before (renderer game resources)
     ;; Clear any old image
     (sdl2:set-render-draw-color renderer #xff #xff #xff #xff)
     (sdl2:render-clear renderer))
 
-  (:method (renderer game textures sprite-sheets)
+  (:method (renderer game resources)
     nil)
 
-  (:method :after (renderer game textures sprite-sheets)
+  (:method :after (renderer game resources)
     ;; display image
     (sdl2:render-present renderer)))
 

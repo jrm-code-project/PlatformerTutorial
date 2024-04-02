@@ -7,7 +7,7 @@
 (defconstant +titles-per-second+ 1)
 (defconstant +ticks-per-title+ (/ +ticks-per-second+ +titles-per-second+))
 
-(defun main-event-loop (game window renderer textures sprite-sheets)
+(defun main-event-loop (game window renderer resources)
   (let ((start-tick (sdl2:get-ticks))
         (last-frame 0)
         (last-title 0)
@@ -20,7 +20,7 @@
                     (this-frame (floor tick +ticks-per-frame+))
                     (this-title (floor tick +ticks-per-title+)))
                (cond ((> this-frame last-frame)
-                      (render-game! renderer game textures sprite-sheets)
+                      (render-game! renderer game resources)
                       (setq last-frame this-frame)
                       (incf frame-count))
                      ((> this-title last-title)
@@ -34,11 +34,12 @@
                      (t (sleep 0.002)))))
 
       (:keydown (:keysym keysym)
-                (format t "~&Keydown: ~s~%" (sdl2:scancode keysym))
-                (force-output)
-                ;; Quit on escape.
-                (when (eql (sdl2:scancode keysym) :scancode-escape)
-                  (sdl2:push-quit-event)))
+                (cond ((or (eql (sdl2:scancode keysym) :scancode-escape)
+                           (eql (sdl2:scancode keysym) :scancode-x))
+                       (sdl2:push-quit-event))
+                      (t
+                       (format t "~&Keydown: ~s~%" (sdl2:scancode keysym))
+                       (force-output))))
 
       (:quit () t)
       )))
@@ -49,8 +50,8 @@
                      :h (game-height)
                      :flags '(:shown))
     (sdl2:with-renderer (renderer window :index -1 :flags '(:accelerated))
-      (with-resources ((textures sprite-sheets) game surfaces renderer)
-        (main-event-loop game window renderer textures sprite-sheets)))))
+      (with-resources ((resources) game surfaces renderer)
+        (main-event-loop game window renderer resources)))))
 
 (defun run (game)
   (with-surfaces (surfaces game)
@@ -96,29 +97,57 @@
              `(:player ,player-sprites-surface))))
 
 (defmethod call-with-resources ((game player-sprites) surfaces renderer receiver)
-  (let-texture (renderer
-                (player-sprites-texture (getf surfaces :player)))
-    (let* ((textures `(:player ,player-sprites-texture))
-           (sprite-sheets (list (make-sprite-sheet (lambda (textures) (getf textures :player))
-                                                   textures
-                                                   #(:idle
-                                                     :running
-                                                     :jumping
-                                                     :falling
-                                                     :landing
-                                                     :hit
-                                                     :attack1
-                                                     :attack2
-                                                     :attack3)
-                                                   #(5 6 3 1 2 4 3 3 3)
-                                                   :baseline-offset 8))))
-      (funcall receiver textures sprite-sheets))))
+  (flet ((make-sprite-sheets (resources)
+           `(:sprite-sheets
+             (:player
+              ,(make-sprite-sheet (lambda (textures) (getf textures :player))
+                                  (getf resources :textures)
+                                  #(:idle
+                                    :running
+                                    :jumping
+                                    :falling
+                                    :landing
+                                    :hit
+                                    :attack1
+                                    :attack2
+                                    :attack3)
+                                  #(5 6 3 1 2 4 3 3 3)
+                                  :baseline-offset 8))
+             ,@resources))
 
-(defmethod render-game! (renderer (game player-sprites) textures sprite-sheets)
-  (render-sprite! renderer textures (car sprite-sheets) :idle 0 (scale 50) (scale 50) :flip? t)
+         (make-frame-sets (resources)
+           `(:frame-sets
+             (:player-idle
+              ,(make-instance 'frame-set
+                              :sprite-sheet (getf (getf resources :sprite-sheets) :player)
+                              :row :idle
+                              :ticks-per-frame 100))
+             ,@resources))
+
+         (make-animations (resources)
+           `(:animations
+             (:player-idle
+              ,(make-instance 'frame-loop
+                              :frame-set (getf (getf resources :frame-sets) :player-idle)))
+             ,@resources)))
+
+    (let-texture (renderer
+                  (player-sprites-texture (getf surfaces :player)))
+      (fold-left (lambda (resources constructor)
+                   (funcall constructor resources))
+                 `(:textures (:player ,player-sprites-texture))
+                 (list #'make-sprite-sheets
+                       #'make-frame-sets
+                       #'make-animations
+                       receiver)))))
+
+(defmethod render-game! (renderer (game player-sprites) resources)
+  (render-animation! renderer (getf resources :textures) (getf (getf resources :animations) :player-idle) (scale 50) (scale 50) :flip? t)
   (sdl2:set-render-draw-color renderer #xff #x00 #x00 #xff)
-  (sdl2:render-draw-line renderer (scale 20) (+ (scale 50) 1) (scale 80) (+ (scale 50) 1))
-  (sdl2:render-draw-line renderer (scale 50) (scale 50) (scale 50) (+ (scale 50) 10))
+  (sdl2:render-draw-line renderer (scale 20) (scale 50) (scale 80) (scale 50))
+  (sdl2:render-draw-line renderer (scale 50) (scale 47) (scale 50) (scale 53))
+  (sdl2:render-draw-line renderer (scale 42) (scale 50) (scale 42) (- (scale 50) (scale 40)))
+  (sdl2:render-draw-line renderer (scale 58) (scale 50) (scale 58) (- (scale 50) (scale 40)))
   )
 
 (defun main ()

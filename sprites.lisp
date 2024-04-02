@@ -22,9 +22,15 @@
                    :rows rows
                    :row-limits row-limits)))
 
+(defun row->index (sprite-sheet row)
+  (position row (get-rows sprite-sheet)))
+
+(defun row-limit (sprite-sheet row)
+  (svref (row-limits sprite-sheet) (row->index sprite-sheet row)))
+
 (defun render-sprite! (renderer textures sprite-sheet row column x y &key flip?)
   (sdl2:with-rects ((src (* column (frame-width sprite-sheet))
-                         (* (position row (get-rows sprite-sheet)) (frame-height sprite-sheet))
+                         (* (row->index sprite-sheet row) (frame-height sprite-sheet))
                          (frame-width sprite-sheet)
                          (frame-height sprite-sheet))
                     (dest (- x (floor (scalef (frame-width sprite-sheet)) 2))
