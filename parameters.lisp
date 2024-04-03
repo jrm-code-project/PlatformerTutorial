@@ -2,7 +2,7 @@
 
 (in-package "TUTORIAL")
 
-(defun game-scale () 3.0)
+(defun game-scale () 2.0)
 (defun scalef (quantity) (* (game-scale) quantity))
 (defun scale  (quantity) (floor (scalef quantity)))
 

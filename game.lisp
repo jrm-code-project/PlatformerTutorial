@@ -3,7 +3,10 @@
 (in-package "TUTORIAL")
 
 (defclass game ()
-  ((steps   :initform (cons 0 nil) :accessor steps)))
+  ((player   :accessor player)
+   (entities :accessor entities)
+
+   (steps   :initform (cons 0 nil) :accessor steps)))
 
 (defgeneric call-with-surfaces (game receiver)
   (:method (game receiver)
@@ -17,13 +20,17 @@
 
 (defgeneric call-with-resources (game surfaces renderer receiver)
   (:method (game surfaces renderer receiver)
-    (funcall receiver nil nil nil)))
+    (funcall receiver nil)))
 
 (defmacro with-resources (((resources) game surfaces renderer) &body body)
   `(CALL-WITH-RESOURCES
     ,game ,surfaces ,renderer
     (LAMBDA (,resources)
       ,@body)))
+
+(defun initialize-game! (game resources)
+  (setf (entities game) (getf resources :entities)
+        (player game)   (getf resources :player)))
 
 (defgeneric render-game! (renderer game resources)
   (:method :before (renderer game resources)
@@ -40,6 +47,14 @@
 
 (defgeneric game-step! (game dticks)
   (:method ((game game) dticks)
+    (when (slot-boundp game 'entities)
+      (dolist (entity (entities game))
+        (unless (null (get-state entity))
+          (entity-step! entity (get-state entity) dticks))))
+    (when (slot-boundp game 'player)
+      (entity-step! (player game) (get-state (player game)) dticks)))
+
+  (:method :after ((game game) dticks)
     (sb-ext:atomic-incf (car (steps game)))))
 
 (defconstant +ticks-per-second+ 1000)

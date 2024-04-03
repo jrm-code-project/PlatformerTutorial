@@ -37,6 +37,9 @@
                 (cond ((or (eql (sdl2:scancode keysym) :scancode-escape)
                            (eql (sdl2:scancode keysym) :scancode-x))
                        (sdl2:push-quit-event))
+                      ((member (sdl2:scancode keysym) '(:scancode-left
+                                                        :scancode-right))
+                       nil)
                       (t
                        (format t "~&Keydown: ~s~%" (sdl2:scancode keysym))
                        (force-output))))
@@ -51,13 +54,14 @@
                      :flags '(:shown))
     (sdl2:with-renderer (renderer window :index -1 :flags '(:accelerated))
       (with-resources ((resources) game surfaces renderer)
-        (main-event-loop game window renderer resources)))))
+        (initialize-game! game resources)
+        (with-game-loop (game)
+          (main-event-loop game window renderer resources))))))
 
 (defun run (game)
   (with-surfaces (surfaces game)
-    (with-game-loop (game)
-      (sdl2:with-init (:video)
-        (main-window game surfaces)))))
+    (sdl2:with-init (:video)
+      (main-window game surfaces))))
 
 #||
 (defclass bouncing-rectangle (game)
@@ -96,6 +100,11 @@
     (funcall receiver
              `(:player ,player-sprites-surface))))
 
+(defun get-resource (key resources)
+  (cond ((consp key) (get-resource (cdr key) (getf resources (car key))))
+        ((null key) resources)
+        (t (error "Dotted list."))))
+
 (defmethod call-with-resources ((game player-sprites) surfaces renderer receiver)
   (flet ((make-sprite-sheets (resources)
            `(:sprite-sheets
@@ -117,18 +126,43 @@
 
          (make-frame-sets (resources)
            `(:frame-sets
-             (:player-idle
-              ,(make-instance 'frame-set
-                              :sprite-sheet (getf (getf resources :sprite-sheets) :player)
-                              :row :idle
-                              :ticks-per-frame 100))
+             (:player
+              (:idle
+               ,(make-instance 'frame-set
+                               :sprite-sheet (get-resource '(:sprite-sheets :player) resources)
+                               :row :idle
+                               :ticks-per-frame 100)
+               :running
+               ,(make-instance 'frame-set
+                               :sprite-sheet (get-resource '(:sprite-sheets :player) resources)
+                               :row :running
+                               :ticks-per-frame 100)))
              ,@resources))
 
          (make-animations (resources)
            `(:animations
-             (:player-idle
-              ,(make-instance 'frame-loop
-                              :frame-set (getf (getf resources :frame-sets) :player-idle)))
+             (:player
+              (:idle
+               ,(make-instance 'frame-loop
+                               :frame-set (get-resource '(:frame-sets :player :idle) resources))
+               :running
+               ,(make-instance 'frame-loop
+                               :frame-set (get-resource '(:frame-sets :player :running) resources))))
+             ,@resources))
+
+         (make-entities (resources)
+           `(:entities
+             nil
+             ,@resources))
+
+         (make-player (resources)
+           `(:player
+             ,(make-instance 'player
+                             :x (scale 50)
+                             :y (scale 50)
+                             :state :idle
+                             :animation (get-resource '(:animations :player :idle) resources)
+                             :frame-sets (get-resource '(:frame-sets :player) resources))
              ,@resources)))
 
     (let-texture (renderer
@@ -139,15 +173,19 @@
                  (list #'make-sprite-sheets
                        #'make-frame-sets
                        #'make-animations
+                       #'make-entities
+                       #'make-player
                        receiver)))))
 
 (defmethod render-game! (renderer (game player-sprites) resources)
-  (render-animation! renderer (getf resources :textures) (getf (getf resources :animations) :player-idle) (scale 50) (scale 50) :flip? t)
+  (dolist (entity (entities game))
+    (unless (null (get-state entity))
+      (render-entity! renderer resources entity)))
+  (render-entity! renderer resources (player game))
+
   (sdl2:set-render-draw-color renderer #xff #x00 #x00 #xff)
   (sdl2:render-draw-line renderer (scale 20) (scale 50) (scale 80) (scale 50))
   (sdl2:render-draw-line renderer (scale 50) (scale 47) (scale 50) (scale 53))
-  (sdl2:render-draw-line renderer (scale 42) (scale 50) (scale 42) (- (scale 50) (scale 40)))
-  (sdl2:render-draw-line renderer (scale 58) (scale 50) (scale 58) (- (scale 50) (scale 40)))
   )
 
 (defun main ()
