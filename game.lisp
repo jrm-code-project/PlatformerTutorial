@@ -3,8 +3,8 @@
 (in-package "TUTORIAL")
 
 (defclass game ()
-  ((player   :accessor player)
-   (entities :accessor entities)
+  ((player  :accessor player)
+   (level   :accessor level)
 
    (steps   :initform (cons 0 nil) :accessor steps)))
 
@@ -29,8 +29,8 @@
       ,@body)))
 
 (defun initialize-game! (game resources)
-  (setf (entities game) (getf resources :entities)
-        (player game)   (getf resources :player)))
+  (setf (level game)  (getf resources :level)
+        (player game) (getf resources :player)))
 
 (defgeneric render-game! (renderer game resources)
   (:method :before (renderer game resources)
@@ -39,7 +39,8 @@
     (sdl2:render-clear renderer))
 
   (:method (renderer game resources)
-    nil)
+    (render-level! renderer resources (level game))
+    (render-entity! renderer resources (player game)))
 
   (:method :after (renderer game resources)
     ;; display image
@@ -47,10 +48,6 @@
 
 (defgeneric game-step! (game dticks)
   (:method ((game game) dticks)
-    (when (slot-boundp game 'entities)
-      (dolist (entity (entities game))
-        (unless (null (get-state entity))
-          (entity-step! entity (get-state entity) dticks))))
     (when (slot-boundp game 'player)
       (entity-step! (player game) (get-state (player game)) dticks)))
 

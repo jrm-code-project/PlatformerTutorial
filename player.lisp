@@ -19,22 +19,46 @@
          1
          0)))
 
-(defmethod entity-step! ((player player) (state (eql :idle)) dticks)
-  (cond ((not (zerop (l/r-input)))
-         (setf (flip? player) (< (l/r-input) 0)
-               (get-state player) :running
-               (get-animation player) (make-instance 'frame-loop :frame-set (getf (frame-sets player) :running))))
-        (t nil)))
+(defun u/d-input ()
+  (- (if (sdl2:keyboard-state-p :scancode-down)
+         1
+         0)
+     (if (sdl2:keyboard-state-p :scancode-up)
+         1
+         0)))
 
-(defun player-speed () (scalef .1))
+(defmethod entity-step! ((player player) (state (eql :idle)) dticks)
+  (let ((l/r (l/r-input))
+        (u/d (u/d-input)))
+
+    (cond ((or (not (zerop l/r))
+               (not (zerop u/d)))
+           (cond ((< l/r 0) (setf (flip? player) t))
+                 ((> l/r 0) (setf (flip? player) nil))
+                 (t nil))
+           (setf (get-state player) :running
+                 (get-animation player) (make-instance 'frame-loop :frame-set (getf (frame-sets player) :running))))
+          (t nil))))
+
+(defun player-speed () (scalef .2))
 
 (defmethod entity-step! ((player player) (state (eql :running)) dticks)
-  (let* ((dx (* (player-speed) (l/r-input) dticks))
-         (x* (+ (get-x player) dx)))
+  (let* ((l/r (l/r-input))
+         (u/d (u/d-input))
+         (dx (* (player-speed) l/r dticks))
+         (dy (* (player-speed) u/d dticks))
+         (x* (+ (get-x player) dx))
+         (y* (+ (get-y player) dy)))
     (when (and (> x* (floor (get-width player) 2))
                (< (+ x* (floor (get-width player) 2)) (game-width)))
       (setf (get-x player) x*))
-    (cond ((zerop (l/r-input))
+    (when (and (> y* (get-height player))
+               (< y* (game-height)))
+      (setf (get-y player) y*))
+    (cond ((and (zerop (l/r-input))
+                (zerop (u/d-input)))
            (setf (get-state player) :idle
                  (get-animation player) (make-instance 'frame-loop :frame-set (getf (frame-sets player) :idle))))
-          (t (setf (flip? player) (< (l/r-input) 0))))))
+          ((< l/r 0) (setf (flip? player) t))
+          ((> l/r 0) (setf (flip? player) nil))
+          (t nil))))

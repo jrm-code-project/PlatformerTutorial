@@ -6,5 +6,8 @@
 (defun scalef (quantity) (* (game-scale) quantity))
 (defun scale  (quantity) (floor (scalef quantity)))
 
-(defun-scaled game-width  420)
-(defun-scaled game-height 400)
+(defun width-in-tiles () 26)
+(defun height-in-tiles () 14)
+(defun-scaled tile-size 32)
+(defun game-width () (* (tile-size) (width-in-tiles)))
+(defun game-height () (* (tile-size) (height-in-tiles)))

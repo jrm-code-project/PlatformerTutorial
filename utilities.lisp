@@ -26,3 +26,9 @@
                  (fold-left-n initial (map 'list #'car tails) (map 'list #'cdr tails)))
                 ((every #'null tails) initial)
                 (t (error "Non list in fold-left.")))))))
+
+(defun get-resource (key resources)
+  (cond ((consp key) (get-resource (cdr key) (getf resources (car key))))
+        ((null key) resources)
+        (t (error "Dotted list."))))
+

@@ -8,6 +8,21 @@
 (defun resource-pathname (namestring)
   (merge-pathnames (parse-namestring namestring) (resource-directory)))
 
+(defun level-files ()
+  (sort
+   (directory (merge-pathnames (make-pathname :directory '(:relative "levels")
+                                              :name :wild
+                                              :type "png")
+                               (resource-directory)))
+   #'string-lessp
+   :key #'pathname-name))
+
+(defun read-level-data ()
+  (map 'list (lambda (level-file)
+               (png-read:image-data
+                (png-read:read-png-file level-file)))
+       (level-files)))
+
 (defun call-with-image-surface (func pathname)
   (let ((surface nil))
     (unwind-protect
