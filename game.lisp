@@ -49,7 +49,7 @@
 (defgeneric game-step! (game dticks)
   (:method ((game game) dticks)
     (when (slot-boundp game 'player)
-      (entity-step! (player game) (get-state (player game)) dticks)))
+      (entity-step! (level game) (player game) (get-state (player game)) dticks)))
 
   (:method :after ((game game) dticks)
     (sb-ext:atomic-incf (car (steps game)))))

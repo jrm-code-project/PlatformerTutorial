@@ -91,7 +91,7 @@
                                     :attack2
                                     :attack3)
                                   #(5 6 3 1 2 4 3 3 3)
-                                  :baseline-offset 8))
+                                  :baseline-offset 9))
              ,@resources))
 
          (make-frame-sets (resources)
@@ -123,8 +123,8 @@
          (make-player (resources)
            `(:player
              ,(make-instance 'player
-                             :x (scale 50)
-                             :y (scale 50)
+                             :x (scale 100)
+                             :y (scale 200)
                              :state :idle
                              :animation (get-resource '(:animations :player :idle) resources)
                              :frame-sets (get-resource '(:frame-sets :player) resources))

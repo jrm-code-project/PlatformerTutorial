@@ -31,3 +31,9 @@
 (defun render-level! (renderer resources level)
   (render-tiles! renderer (get-resource '(:textures :outside) resources) (tiles level)))
 
+(defun blank-tile? (level tile-y tile-x)
+  (and (>= tile-x 0)
+       (< tile-x (array-dimension (tiles level) 1))
+       (>= tile-y 0)
+       (< tile-y (array-dimension (tiles level) 0))
+       (= 11 (aref (tiles level) tile-y tile-x 0))))

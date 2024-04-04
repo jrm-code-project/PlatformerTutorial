@@ -27,7 +27,7 @@
          1
          0)))
 
-(defmethod entity-step! ((player player) (state (eql :idle)) dticks)
+(defmethod entity-step! (level (player player) (state (eql :idle)) dticks)
   (let ((l/r (l/r-input))
         (u/d (u/d-input)))
 
@@ -42,19 +42,17 @@
 
 (defun player-speed () (scalef .2))
 
-(defmethod entity-step! ((player player) (state (eql :running)) dticks)
+(defmethod entity-step! (level (player player) (state (eql :running)) dticks)
   (let* ((l/r (l/r-input))
          (u/d (u/d-input))
          (dx (* (player-speed) l/r dticks))
-         (dy (* (player-speed) u/d dticks))
-         (x* (+ (get-x player) dx))
-         (y* (+ (get-y player) dy)))
-    (when (and (> x* (floor (get-width player) 2))
-               (< (+ x* (floor (get-width player) 2)) (game-width)))
-      (setf (get-x player) x*))
-    (when (and (> y* (get-height player))
-               (< y* (game-height)))
-      (setf (get-y player) y*))
+         (dy (* (player-speed) u/d dticks)))
+    (cond ((< dx 0) (move-entity-left! level player dx))
+          ((> dx 0) (move-entity-right! level player dx))
+          (t nil))
+    (cond ((< dy 0) (move-entity-up! level player dy))
+          ((> dy 0) (move-entity-down! level player dy))
+          (t nil))
     (cond ((and (zerop (l/r-input))
                 (zerop (u/d-input)))
            (setf (get-state player) :idle
