@@ -62,6 +62,14 @@
   (or (point-supported? level (get-left entity) (get-bottom entity))
       (point-supported? level (get-right entity) (get-bottom entity))))
 
+(defun point-covered? (level x y)
+  (multiple-value-bind (tile-x tile-y) (coord->tile x (- y 1))
+    (not (blank-tile? level tile-x tile-y))))
+
+(defun entity-covered? (level entity)
+  (or (point-covered? level (get-left entity) (get-top entity))
+      (point-covered? level (get-left entity) (get-top entity))))
+
 (defun tile-left (tile-x)
   (* tile-x (tile-size)))
 
