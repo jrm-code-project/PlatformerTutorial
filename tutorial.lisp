@@ -94,30 +94,44 @@
                                   :baseline-offset 9))
              ,@resources))
 
-         (make-frame-sets (resources)
-           `(:frame-sets
-             (:player
-              (:idle
-               ,(make-instance 'frame-set
-                               :sprite-sheet (get-resource '(:sprite-sheets :player) resources)
-                               :row :idle
-                               :ticks-per-frame 100)
-               :running
-               ,(make-instance 'frame-set
-                               :sprite-sheet (get-resource '(:sprite-sheets :player) resources)
-                               :row :running
-                               :ticks-per-frame 100)))
-             ,@resources))
-
          (make-animations (resources)
            `(:animations
              (:player
-              (:idle
-               ,(make-instance 'frame-loop
-                               :frame-set (get-resource '(:frame-sets :player :idle) resources))
+              (:falling
+               ,(let ((frame-set (make-instance 'frame-set
+                                                :sprite-sheet (get-resource '(:sprite-sheets :player) resources)
+                                                :row :falling
+                                                :ticks-per-frame 1000)))
+                  (lambda ()
+                    (make-instance 'frame-loop :frame-set frame-set)))
+               :idle
+               ,(let ((frame-set (make-instance 'frame-set
+                                                :sprite-sheet (get-resource '(:sprite-sheets :player) resources)
+                                                :row :idle
+                                                :ticks-per-frame 100)))
+                  (lambda ()
+                    (make-instance 'frame-loop :frame-set frame-set)))
+               :jumping
+               ,(let ((frame-set (make-instance 'frame-set
+                                                :sprite-sheet (get-resource '(:sprite-sheets :player) resources)
+                                                :row :jumping
+                                                :ticks-per-frame 100)))
+                  (lambda ()
+                    (make-instance 'one-shot :frame-set frame-set)))
+               :landing
+               ,(let ((frame-set (make-instance 'frame-set
+                                                :sprite-sheet (get-resource '(:sprite-sheets :player) resources)
+                                                :row :landing
+                                                :ticks-per-frame 100)))
+                  (lambda ()
+                    (make-instance 'one-shot :frame-set frame-set)))
                :running
-               ,(make-instance 'frame-loop
-                               :frame-set (get-resource '(:frame-sets :player :running) resources))))
+               ,(let ((frame-set (make-instance 'frame-set
+                                                :sprite-sheet (get-resource '(:sprite-sheets :player) resources)
+                                                :row :idle
+                                                :ticks-per-frame 100)))
+                  (lambda ()
+                    (make-instance 'frame-loop :frame-set frame-set)))))
              ,@resources))
 
          (make-player (resources)
@@ -126,8 +140,8 @@
                              :x (scale 100)
                              :y (scale 200)
                              :state :idle
-                             :animation (get-resource '(:animations :player :idle) resources)
-                             :frame-sets (get-resource '(:frame-sets :player) resources))
+                             :animation (funcall (get-resource '(:animations :player :idle) resources))
+                             :animations (get-resource '(:animations :player) resources))
              ,@resources))
 
          (make-level (resources)
@@ -146,7 +160,6 @@
                    (:outside ,outside-sprites-texture
                     :player ,player-sprites-texture))
                  (list #'make-sprite-sheets
-                       #'make-frame-sets
                        #'make-animations
                        #'make-player
                        #'make-level
