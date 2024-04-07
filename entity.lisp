@@ -40,6 +40,12 @@
 (defun get-bottom (entity)
   (floor (get-y entity)))
 
+(defun entity-under-point? (entity x y)
+  (and (>= x (get-left entity))
+       (<= x (get-right entity))
+       (>= y (get-top entity))
+       (<= y (get-bottom entity))))
+
 (defparameter *render-hitbox* nil)
 
 (defmethod render-entity! :after (renderer resources (entity hitbox))

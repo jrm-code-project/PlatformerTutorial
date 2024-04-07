@@ -37,6 +37,13 @@
          (absolute-frame  (floor total-ticks (ticks-per-frame (frame-set one-shot)))))
     (>= absolute-frame (frame-set-length (frame-set one-shot)))))
 
+(defclass slides (animation)
+  ((current-slide :initarg :current-slide :accessor current-slide)
+   (slides :initarg :slides :reader slides)))
+
+(defmethod get-frame ((slides slides))
+  (position (current-slide slides) (slides slides)))
+
 (defun render-animation! (renderer textures animation x y &key flip?)
   (let ((frame (get-frame animation)))
     (render-sprite! renderer textures (sprite-sheet (frame-set animation))

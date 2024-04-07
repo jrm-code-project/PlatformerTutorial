@@ -4,9 +4,10 @@
 
 (defclass level ()
   ((entities :initarg :entities :accessor entities)
-   (tiles    :initarg :tiles :accessor tiles)))
+   (player   :initarg :player   :accessor player)
+   (tiles    :initarg :tiles    :accessor tiles)))
 
-(defparameter *render-tiles* nil)
+(defparameter *render-tile-outline* nil)
 
 (defun render-tiles! (renderer outside-texture tiles)
   (dotimes (row (height-in-tiles))
@@ -25,11 +26,18 @@
                                 outside-texture
                                 :source-rect src
                                 :dest-rect dst)
-              (when *render-tiles*
+              (when *render-tile-outline*
                 (sdl2:render-draw-rect renderer dst))))))))
 
-(defun render-level! (renderer resources level)
-  (render-tiles! renderer (get-resource '(:textures :outside) resources) (tiles level)))
+(defmethod render-level! (renderer resources (level level))
+  (render-tiles! renderer (get-resource '(:textures :outside) resources) (tiles level))
+  (render-entity! renderer resources (player level)))
+
+(defmethod level-step! (game (level level) dticks)
+  (if (sdl2:keyboard-state-p :scancode-backspace)
+      (setf (level game) (menu game))
+      (dolist (entity (cons (player level) (entities level)))
+        (entity-step! level entity (get-state entity) dticks))))
 
 (defun blank-tile? (level tile-y tile-x)
   (and (>= tile-x 0)

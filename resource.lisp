@@ -8,6 +8,8 @@
 (defun resource-pathname (namestring)
   (merge-pathnames (parse-namestring namestring) (resource-directory)))
 
+(defun text-font () (resource-pathname "Inconsolata-Regular.ttf"))
+
 (defun level-files ()
   (sort
    (directory (merge-pathnames (make-pathname :directory '(:relative "levels")

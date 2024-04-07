@@ -1,30 +1,42 @@
 ;;; -*- Lisp -*-
 
 (defsystem "tutorial"
-  :depends-on ("png-read" "sdl2" "sdl2-image")
+  :depends-on ("png-read" "sdl2" "sdl2-image" "sdl2-ttf")
   :components ((:file "animation" :depends-on ("macros"
                                                "package"
                                                "parameters"
                                                "resource"
                                                "texture"
                                                "sprites"))
+               (:file "button"   :depends-on ("animation"
+                                              "entity"
+                                              "macros"
+                                              "package"
+                                              "parameters"))
                (:file "entity"   :depends-on ("macros"
                                               "package"
                                               "parameters"))
                (:file "game" :depends-on ("animation"
-                                          "level"
                                           "macros"
                                           "package"
                                           "parameters"
                                           "resource"
                                           "texture"))
-               (:file "level"    :depends-on ("macros"
+               (:file "level"    :depends-on ("game"
+                                              "macros"
                                               "package"
                                               "parameters"
                                               "resource"
                                               "texture"
                                               "utilities"))
                (:file "macros"   :depends-on ("package"))
+               (:file "menu"     :depends-on ("game"
+                                              "macros"
+                                              "package"
+                                              "parameters"
+                                              "resource"
+                                              "texture"
+                                              "utilities"))
                (:file "package")
                (:file "parameters" :depends-on ("macros"
                                                 "package"))

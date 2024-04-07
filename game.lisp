@@ -3,9 +3,9 @@
 (in-package "TUTORIAL")
 
 (defclass game ()
-  ((player  :accessor player)
-   (level   :accessor level)
-
+  ((level       :accessor level)
+   (first-level :accessor first-level)
+   (menu        :accessor menu)
    (steps   :initform (cons 0 nil) :accessor steps)))
 
 (defgeneric call-with-surfaces (game receiver)
@@ -29,30 +29,25 @@
       ,@body)))
 
 (defun initialize-game! (game resources)
-  (setf (level game)  (getf resources :level)
-        (player game) (getf resources :player)))
+  (setf (first-level game) (getf resources :level)
+        (level game)  (getf resources :level)
+        (menu game)   (getf resources :menu)))
 
-(defgeneric render-game! (renderer game resources)
-  (:method :before (renderer game resources)
-    ;; Clear any old image
-    (sdl2:set-render-draw-color renderer #xff #xff #xff #xff)
-    (sdl2:render-clear renderer))
+(defgeneric render-level! (renderer resources level))
 
-  (:method (renderer game resources)
-    (render-level! renderer resources (level game))
-    (render-entity! renderer resources (player game)))
+(defun render-game! (renderer game resources)
+  ;; Clear any old image
+  (sdl2:set-render-draw-color renderer #xff #xff #xff #xff)
+  (sdl2:render-clear renderer)
 
-  (:method :after (renderer game resources)
-    ;; display image
-    (sdl2:render-present renderer)))
+  (render-level! renderer resources (level game))
 
-(defgeneric game-step! (game dticks)
-  (:method ((game game) dticks)
-    (when (slot-boundp game 'player)
-      (entity-step! (level game) (player game) (get-state (player game)) dticks)))
+  ;; display image
+  (sdl2:render-present renderer))
 
-  (:method :after ((game game) dticks)
-    (sb-ext:atomic-incf (car (steps game)))))
+(defun game-step! (game dticks)
+  (level-step! game (level game) dticks)
+  (sb-ext:atomic-incf (car (steps game))))
 
 (defconstant +ticks-per-second+ 1000)
 (defconstant +steps-per-second+ 200)
