@@ -8,7 +8,7 @@
 
 (defclass button (hitbox entity)
   ((action :initarg :action
-           :initform (lambda () (format t "~&Unimplemented button.~%"))
+           :initform (lambda (button) (format t "~&Unimplemented button.~%"))
            :reader action)))
 
 (defmethod entity-step! (level (button button) (state (eql :idle)) dticks)
@@ -39,5 +39,25 @@
           ((not (logbitp 0 mouse-buttons))
            (setf (get-state button) :idle
                  (current-slide (get-animation button)) :idle)
-           (funcall (action button)))
+           (funcall (action button) button))
+          (t nil))))
+
+(defclass slider (button)
+  ((left-limit  :initarg :left-limit  :reader left-limit)
+   (right-limit :initarg :right-limit :reader right-limit)))
+
+(defmethod entity-step! (level (slider slider) (state (eql :pressed)) dticks)
+  (declare (ignore dticks))
+  (multiple-value-bind (mouse-x mouse-y mouse-buttons) (sdl2:mouse-state)
+    (cond ((not (entity-under-point? slider mouse-x mouse-y))
+           (setf (get-state slider) :idle
+                 (current-slide (get-animation slider)) :idle)
+           (funcall (action slider) slider))
+          ((not (logbitp 0 mouse-buttons))
+           (setf (get-state slider) :idle
+                 (current-slide (get-animation slider)) :idle)
+           (funcall (action slider) slider))
+          ((and (>= mouse-x (left-limit slider))
+                (<= mouse-x (right-limit slider)))
+           (setf (get-x slider) mouse-x))
           (t nil))))

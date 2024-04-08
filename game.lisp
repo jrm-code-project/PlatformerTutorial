@@ -6,6 +6,7 @@
   ((level       :accessor level)
    (first-level :accessor first-level)
    (menu        :accessor menu)
+   (paused-menu :accessor paused-menu)
    (steps   :initform (cons 0 nil) :accessor steps)))
 
 (defgeneric call-with-surfaces (game receiver)
@@ -30,17 +31,18 @@
 
 (defun initialize-game! (game resources)
   (setf (first-level game) (getf resources :level)
+        (paused-menu game) (getf resources :pause-menu)
         (level game)  (getf resources :level)
         (menu game)   (getf resources :menu)))
 
-(defgeneric render-level! (renderer resources level))
+(defgeneric render-level! (renderer resources game level))
 
 (defun render-game! (renderer game resources)
   ;; Clear any old image
   (sdl2:set-render-draw-color renderer #xff #xff #xff #xff)
   (sdl2:render-clear renderer)
 
-  (render-level! renderer resources (level game))
+  (render-level! renderer resources game (level game))
 
   ;; display image
   (sdl2:render-present renderer))

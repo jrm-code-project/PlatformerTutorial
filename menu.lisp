@@ -15,7 +15,7 @@
                    (entity-step! menu entity (get-state entity) dticks)))
            (get-buttons menu))))
 
-(defmethod render-level! (renderer resources (menu menu))
+(defmethod render-level! (renderer resources game (menu menu))
   (let* ((texture (get-resource '(:textures :menu) resources))
          (height (sdl2:texture-height texture))
          (width (sdl2:texture-width texture))

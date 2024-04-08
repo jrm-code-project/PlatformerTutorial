@@ -29,15 +29,18 @@
               (when *render-tile-outline*
                 (sdl2:render-draw-rect renderer dst))))))))
 
-(defmethod render-level! (renderer resources (level level))
+(defmethod render-level! (renderer resources game (level level))
   (render-tiles! renderer (get-resource '(:textures :outside) resources) (tiles level))
   (render-entity! renderer resources (player level)))
 
 (defmethod level-step! (game (level level) dticks)
-  (if (sdl2:keyboard-state-p :scancode-backspace)
-      (setf (level game) (menu game))
-      (dolist (entity (cons (player level) (entities level)))
-        (entity-step! level entity (get-state entity) dticks))))
+  (cond ((sdl2:keyboard-state-p :scancode-backspace)
+         (setf (level game) (menu game)))
+        ((sdl2:keyboard-state-p :scancode-escape)
+         (setf (level game) (paused-menu game)))
+        (t
+         (dolist (entity (cons (player level) (entities level)))
+           (entity-step! level entity (get-state entity) dticks)))))
 
 (defun blank-tile? (level tile-y tile-x)
   (and (>= tile-x 0)
