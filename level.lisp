@@ -97,6 +97,9 @@
   (render-big-clouds! renderer (get-resource '(:textures :big-clouds) resources))
   (render-small-clouds! renderer (get-resource '(:textures :small-clouds) resources) (get-cloud-heights level))
   (render-tiles! renderer (get-resource '(:textures :outside) resources) (tiles level))
+  (map nil (lambda (entity)
+             (render-entity! renderer resources entity))
+       (entities level))
   (render-entity! renderer resources (player level)))
 
 (defmethod level-step! (game (level level) dticks)

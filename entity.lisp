@@ -11,9 +11,10 @@
    (animations :initarg :animations         :reader   animations)
    (flip       :initarg :flip :initform nil :accessor flip?)))
 
-(defgeneric entity-step! (level entity state dticks)
-  (:method (level (entity entity) state dticks)
-    nil))
+(defgeneric enemy? (entity)
+  (:method ((entity entity)) nil))
+
+(defgeneric entity-step! (level entity state dticks))
 
 (defun start-animation! (entity animation)
   (setf (get-animation entity) (funcall (getf (animations entity) animation))))

@@ -114,7 +114,9 @@
 (defmethod call-with-surfaces ((game platformer) receiver)
   (let-surfaces ((big-clouds-surface          (resource-pathname "big_clouds.png"))
                  (button-atlas-surface        (resource-pathname "button_atlas.png"))
+                 (crabby-atlas-surface        (resource-pathname "crabby_sprite.png"))
                  (menu-surface                (resource-pathname "menu_background.png"))
+                 (menu-background-surface     (resource-pathname "background_menu.png"))
                  (outside-sprites-surface     (resource-pathname "outside_sprites.png"))
                  (pause-menu-surface          (resource-pathname "pause_menu.png"))
                  (player-sprites-surface      (resource-pathname "player_sprites.png"))
@@ -126,7 +128,9 @@
     (funcall receiver
              `(:big-clouds          ,big-clouds-surface
                :button-atlas        ,button-atlas-surface
+               :crabby-atlas        ,crabby-atlas-surface
                :menu                ,menu-surface
+               :menu-background     ,menu-background-surface
                :outside             ,outside-sprites-surface
                :pause-menu          ,pause-menu-surface
                :player              ,player-sprites-surface
@@ -180,6 +184,27 @@
                    ,(button-animation button-atlas :options)
                    :quit
                    ,(button-animation button-atlas :quit)))
+              :crabby
+              ,(let ((crabby-sprite-sheet
+                       (make-sprite-sheet (lambda (textures) (getf textures :crabby))
+                                          (getf resources :textures)
+                                          #(:idle
+                                            :running
+                                            :attack
+                                            :hit
+                                            :dying)
+                                          #(9 6 7 4 5)
+                                          :baseline-offset 4)))
+                 `(:attack
+                   ,(frame-loop-animation crabby-sprite-sheet :attack)
+                   :dying
+                   ,(frame-loop-animation crabby-sprite-sheet :dying)
+                   :hit
+                   ,(frame-loop-animation crabby-sprite-sheet :hit)                                            
+                   :idle
+                   ,(frame-loop-animation crabby-sprite-sheet :idle)                                            
+                   :running
+                   ,(frame-loop-animation crabby-sprite-sheet :running)))
               :player
               ,(let ((player-sprite-sheet
                        (make-sprite-sheet (lambda (textures) (getf textures :player))
@@ -247,16 +272,32 @@
 
          (make-level (resources)
            `(:level
-             ,(let ((player (make-instance 'player
-                                           :x (scale 100)
-                                           :y (scale 200)
+             ,(let ((player nil)
+                    (entities nil)
+                    (level-tiles (car (read-level-data))))
+                (dotimes (i (level-tiles-width level-tiles))
+                  (dotimes (j (level-tiles-height level-tiles))
+                    (cond ((= 100 (aref level-tiles i j 1))
+                           (setq player
+                                 (make-instance 'player
+                                           :x (+ (/ (tile-size) 2) (* i (tile-size)))
+                                           :y (- (* (+ j 1) (tile-size)) 1)
                                            :state :idle
                                            :animation (funcall (get-resource '(:animations :player :idle) resources))
                                            :animations (get-resource '(:animations :player) resources))))
+                          ((zerop (aref level-tiles i j 1))
+                           (push (make-instance 'crabby
+                                                :x (+ (/ (tile-size) 2) (* i (tile-size)))
+                                                :y (- (* (+ j 1) (tile-size)) 1)
+                                                :state :idle
+                                                :animation (funcall (get-resource '(:animations :crabby :idle) resources))
+                                                :animations (get-resource '(:animations :crabby) resources))
+                                 entities))
+                          (t nil))))
                 (make-instance 'level
-                               :tiles (car (read-level-data))
+                               :tiles level-tiles
                                :player player
-                               :entities '()))
+                               :entities entities))
              ,@resources))
 
          (make-menu (resources)
@@ -385,7 +426,9 @@
     (let-texture (renderer
                   (big-clouds-texture      (getf surfaces :big-clouds))
                   (button-atlas-texture    (getf surfaces :button-atlas))
+                  (crabby-atlas-texture    (getf surfaces :crabby-atlas))
                   (menu-texture            (getf surfaces :menu))
+                  (menu-background-texture (getf surfaces :menu-background))
                   (outside-sprites-texture (getf surfaces :outside))
                   (pause-menu-texture      (getf surfaces :pause-menu))
                   (player-sprites-texture  (getf surfaces :player))
@@ -399,7 +442,9 @@
                  `(:textures
                    (:big-clouds          ,big-clouds-texture
                     :button-atlas        ,button-atlas-texture
+                    :crabby              ,crabby-atlas-texture
                     :menu                ,menu-texture
+                    :menu-background     ,menu-background-texture
                     :outside             ,outside-sprites-texture
                     :pause-menu          ,pause-menu-texture
                     :playing-background  ,playing-background-texture
