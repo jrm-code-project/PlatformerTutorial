@@ -112,20 +112,26 @@
   ())
 
 (defmethod call-with-surfaces ((game platformer) receiver)
-  (let-surfaces ((button-atlas-surface        (resource-pathname "button_atlas.png"))
+  (let-surfaces ((big-clouds-surface          (resource-pathname "big_clouds.png"))
+                 (button-atlas-surface        (resource-pathname "button_atlas.png"))
                  (menu-surface                (resource-pathname "menu_background.png"))
                  (outside-sprites-surface     (resource-pathname "outside_sprites.png"))
                  (pause-menu-surface          (resource-pathname "pause_menu.png"))
                  (player-sprites-surface      (resource-pathname "player_sprites.png"))
+                 (playing-background-surface  (resource-pathname "playing_bg_img.png"))
+                 (small-clouds-surface        (resource-pathname "small_clouds.png"))
                  (sound-button-atlas-surface  (resource-pathname "sound_button.png"))
                  (urm-button-atlas-surface    (resource-pathname "urm_buttons.png"))
                  (volume-button-atlas-surface (resource-pathname "volume_buttons.png")))
     (funcall receiver
-             `(:button-atlas        ,button-atlas-surface
+             `(:big-clouds          ,big-clouds-surface
+               :button-atlas        ,button-atlas-surface
                :menu                ,menu-surface
                :outside             ,outside-sprites-surface
                :pause-menu          ,pause-menu-surface
                :player              ,player-sprites-surface
+               :playing-background  ,playing-background-surface
+               :small-clouds        ,small-clouds-surface
                :sound-button-atlas  ,sound-button-atlas-surface
                :urm-button-atlas    ,urm-button-atlas-surface
                :volume-button-atlas ,volume-button-atlas-surface))))
@@ -377,22 +383,28 @@
              ,@resources)))
 
     (let-texture (renderer
+                  (big-clouds-texture      (getf surfaces :big-clouds))
                   (button-atlas-texture    (getf surfaces :button-atlas))
                   (menu-texture            (getf surfaces :menu))
                   (outside-sprites-texture (getf surfaces :outside))
                   (pause-menu-texture      (getf surfaces :pause-menu))
                   (player-sprites-texture  (getf surfaces :player))
+                  (playing-background-texture (getf surfaces :playing-background))
+                  (small-clouds-texture    (getf surfaces :small-clouds))
                   (sound-atlas-texture     (getf surfaces :sound-button-atlas))
                   (urm-atlas-texture       (getf surfaces :urm-button-atlas))
                   (volume-atlas-texture    (getf surfaces :volume-button-atlas)))
       (fold-left (lambda (resources constructor)
                    (funcall constructor resources))
                  `(:textures
-                   (:button-atlas        ,button-atlas-texture
+                   (:big-clouds          ,big-clouds-texture
+                    :button-atlas        ,button-atlas-texture
                     :menu                ,menu-texture
                     :outside             ,outside-sprites-texture
                     :pause-menu          ,pause-menu-texture
+                    :playing-background  ,playing-background-texture
                     :player              ,player-sprites-texture
+                    :small-clouds        ,small-clouds-texture
                     :sound-button-atlas  ,sound-atlas-texture
                     :urm-button-atlas    ,urm-atlas-texture
                     :volume-button-atlas ,volume-atlas-texture))

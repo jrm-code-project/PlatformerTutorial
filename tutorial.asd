@@ -40,11 +40,11 @@
                (:file "package")
                (:file "parameters" :depends-on ("macros"
                                                 "package"))
-               (:file "paused-menu" :depends-on ("animations"
-                                                 "entity"
-                                                 "level"
-                                                 "macros"
-                                                 "package"))
+               (:file "pause-menu" :depends-on ("animation"
+                                                "entity"
+                                                "level"
+                                                "macros"
+                                                "package"))
                (:file "player"   :depends-on ("entity"
                                               "macros"
                                               "package"
