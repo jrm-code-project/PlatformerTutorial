@@ -34,9 +34,10 @@
        (get-buttons pause-menu)))
 
 (defun render-pause-menu! (renderer resources pause-menu)
-  (map nil (lambda (button)
-             (render-entity! renderer resources button))
-       (get-buttons pause-menu)))
+  (let ((*world-x-offset* 0))
+    (map nil (lambda (button)
+               (render-entity! renderer resources button))
+         (get-buttons pause-menu))))
 
 (defmethod render-level! (renderer resources game (pause-menu pause-menu))
   (let ((background-texture (get-resource '(:textures :pause-menu) resources)))

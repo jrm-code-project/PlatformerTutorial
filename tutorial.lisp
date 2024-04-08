@@ -296,7 +296,10 @@
              ,(make-instance
                'pause-menu
                :buttons
-               (let* ((sound-texture (get-resource '(:textures :sound-button-atlas) resources))
+               (let* ((urm-texture (get-resource '(:textures :urm-button-atlas) resources))
+                      (urm-button-width (scale (floor (sdl2:texture-width urm-texture) 3)))
+                      (urm-button-height (scale (floor (sdl2:texture-width urm-texture) 3)))
+                      (sound-texture (get-resource '(:textures :sound-button-atlas) resources))
                       (sound-button-height (scale (floor (sdl2:texture-height sound-texture) 2)))
                       (sound-button-width  (scale (floor (sdl2:texture-width sound-texture) 3)))
                       (volume-texture (get-resource '(:textures :volume-button-atlas) resources))
@@ -343,8 +346,8 @@
                   (make-instance
                    'button :x (menu-button-position-x)
                    :y (menu-button-position-y)
-                   :height sound-button-height
-                   :width sound-button-width
+                   :height urm-button-height
+                   :width urm-button-width
                    :state :idle
                    :animation (funcall (get-resource '(:animations :urm-buttons :menu) resources))
                    :action (lambda (button)
@@ -353,8 +356,8 @@
                   (make-instance
                    'button :x (restart-button-position-x)
                    :y (restart-button-position-y)
-                   :height sound-button-height
-                   :width sound-button-width
+                   :height urm-button-height
+                   :width urm-button-width
                    :state :idle
                    :animation (funcall (get-resource '(:animations :urm-buttons :restart) resources))
                    :action (lambda (button)
@@ -363,8 +366,8 @@
                   (make-instance
                    'button :x (resume-button-position-x)
                    :y (resume-button-position-y)
-                   :height sound-button-height
-                   :width sound-button-width
+                   :height urm-button-height
+                   :width urm-button-width
                    :state :idle
                    :animation (funcall (get-resource '(:animations :urm-buttons :resume) resources))
                    :action (lambda (button)

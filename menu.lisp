@@ -28,6 +28,7 @@
                            scaled-height))
       (sdl2:render-copy renderer texture :source-rect src :dest-rect dst)))
                             
-  (map nil (lambda (button)
-              (render-entity! renderer resources button))
-        (get-buttons menu)))
+  (let ((*world-x-offset* 0))
+    (map nil (lambda (button)
+               (render-entity! renderer resources button))
+         (get-buttons menu))))
