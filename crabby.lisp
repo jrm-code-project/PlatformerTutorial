@@ -11,7 +11,8 @@
    (x-velocity :initform 0 :accessor get-x-velocity))
   (:default-initargs
    :width (crabby-width)
-   :height (crabby-height)))
+   :height (crabby-height)
+   :initial-health 20))
 
 (defmethod entity-step! (level (crabby crabby) (state (eql :falling)) dticks)
   (if (entity-supported? level crabby)
@@ -26,6 +27,9 @@
     (cond ((not (entity-supported? level crabby))
            (setf (delta-y crabby) 0
                  (get-state crabby) :falling))
+          ((not (plusp (get-health crabby)))
+           (setf (get-state crabby) :dying
+                 (get-animation crabby) (funcall (getf (animations crabby) :dying))))
           ((and (< (abs (- (get-y crabby) (get-y player))) (tile-size))
                 (< (abs (- (get-x crabby) (get-x player))) (* 5 (tile-size))))
            (setf (get-state crabby) :running
@@ -37,7 +41,11 @@
 
 (defmethod entity-step! (level (crabby crabby) (state (eql :running)) dticks)
   (move-entity-horizontally! level crabby (* (get-x-velocity crabby) dticks))
-  (cond ((or (unsupported-on-left? level crabby)
+  (cond ((not (plusp (get-health crabby)))
+         (setf (get-state crabby) :dying
+               (get-animation crabby) (funcall (getf (animations crabby) :dying))
+               (get-x-velocity crabby) 0))
+        ((or (unsupported-on-left? level crabby)
             (against-left-wall? level crabby))
          (setf (get-x-velocity crabby) (crabby-velocity)))
         ((or (unsupported-on-right? level crabby)
@@ -52,3 +60,18 @@
               (< (- (get-x crabby) (get-x (player level))) (* 5 (tile-size))))
          (setf (get-x-velocity crabby) (- (crabby-velocity))))
         (t nil)))
+
+(defmethod entity-step! (level (crabby crabby) (state (eql :hit)) dticks)
+  (cond ((not (plusp (get-health crabby)))
+         (setf (get-state crabby) :dying
+               (get-animation crabby) (funcall (getf (animations crabby) :dying))
+               (get-x-velocity crabby) 0))
+        ((animation-finished? (get-animation crabby))
+         (setf (get-state crabby) :idle
+               (get-animation crabby) (funcall (getf (animations crabby) :idle))))
+        (t nil)))
+
+(defmethod entity-step! (level (crabby crabby) (state (eql :dying)) dticks)
+  (when (animation-finished? (get-animation crabby))
+    (setf (get-state crabby) nil)))
+

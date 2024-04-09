@@ -25,6 +25,57 @@
                        (- (floor (get-x entity)) *world-x-offset*)
                        (floor (get-y entity)) :flip? (flip? entity))))
 
+(defclass health ()
+  ((health :initarg :initial-health :accessor get-health)))
+
+(defgeneric hit! (entity)
+  (:method ((entity health))
+    (decf (get-health entity) 10)
+    (setf (get-state entity) :hit
+          (get-animation entity) (funcall (getf (animations entity) :hit)))))
+
+(defclass attackbox ()
+  ((attackbox-width    :initarg :attackbox-width    :reader get-attackbox-width)
+   (attackbox-height   :initarg :attackbox-height   :reader get-attackbox-height)
+   (attackbox-x-offset :initarg :attackbox-x-offset :reader get-attackbox-x-offset)
+   (attackbox-y-offset :initarg :attackbox-y-offset :reader get-attackbox-y-offset)))
+
+(defun attack-left (entity)
+  (if (flip? entity)
+      (- (get-x entity)
+         (get-attackbox-x-offset entity)
+         (get-attackbox-width entity))
+      (+ (get-x entity)
+         (get-attackbox-x-offset entity))))
+
+(defun attack-right (entity)
+  (if (flip? entity)
+      (- (get-x entity)
+         (get-attackbox-x-offset entity))
+      (+ (get-x entity)
+            (get-attackbox-x-offset entity)
+            (get-attackbox-width entity))))
+
+(defun attack-top (entity)
+  (- (get-y entity)
+     (get-attackbox-y-offset entity)
+     (get-attackbox-height entity)))
+
+(defun attack-bottom (entity)
+  (- (get-y entity)
+     (get-attackbox-y-offset entity)))
+
+(defparameter *render-attackbox* nil)
+
+(defmethod render-entity! :after (renderer resources (entity attackbox))
+  (when *render-attackbox*
+    (sdl2:set-render-draw-color renderer #x00 #x00 #xFF #xFF)
+    (sdl2:with-rects ((r (floor (- (attack-left entity) *world-x-offset*))
+                         (floor (attack-top entity))
+                         (get-attackbox-width entity)
+                         (get-attackbox-height entity)))
+      (sdl2:render-draw-rect renderer r))))
+
 (defclass hitbox ()
   ((width  :initarg :width  :reader get-width)
    (height :initarg :height :reader get-height)))
@@ -52,11 +103,17 @@
 (defmethod render-entity! :after (renderer resources (entity hitbox))
   (when *render-hitbox*
     (sdl2:set-render-draw-color renderer #xff #x00 #x00 #xFF)
-    (sdl2:with-rects ((r (- (get-left entity) *world-x-offset*)
-                         (get-top entity)
+    (sdl2:with-rects ((r (floor (- (get-left entity) *world-x-offset*))
+                         (floor (get-top entity))
                          (get-width entity)
                          (get-height entity)))
       (sdl2:render-draw-rect renderer r))))
+
+(defun can-attack? (attacker defender)
+  (not (or (< (attack-right attacker) (get-left defender))
+           (> (attack-left attacker) (get-right defender))
+           (< (attack-bottom attacker) (get-top defender))
+           (> (attack-top attacker) (get-bottom defender)))))
 
 (defun entity-supported? (level entity)
   (or (point-supported? level (get-left entity) (get-bottom entity))

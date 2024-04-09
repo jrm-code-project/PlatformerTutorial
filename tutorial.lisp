@@ -81,6 +81,7 @@
                                                         :scancode-left
                                                         :scancode-return
                                                         :scancode-right
+                                                        :scancode-space
                                                         :scancode-up))
                        nil)
                       (t
@@ -220,7 +221,9 @@
                                             :attack3)
                                           #(5 6 3 1 2 4 3 3 3)
                                           :baseline-offset 9)))
-                 `(:falling
+                 `(:attack1
+                   ,(frame-loop-animation player-sprite-sheet :attack1)
+                   :falling
                    ,(frame-loop-animation player-sprite-sheet :falling)
                    :idle
                    ,(frame-loop-animation player-sprite-sheet :idle)

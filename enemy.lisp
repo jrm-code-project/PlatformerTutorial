@@ -2,7 +2,7 @@
 
 (in-package "TUTORIAL")
 
-(defclass enemy (hitbox entity)
+(defclass enemy (hitbox health entity)
   ((x-velocity :initform 0 :accessor get-x-velocity)))
 
 (defmethod (setf get-x-velocity) :after (new-x-velocity (entity entity))

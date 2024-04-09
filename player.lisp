@@ -5,11 +5,20 @@
 (defun-scaled player-width 16)
 (defun-scaled player-height 26)
 
-(defclass player (hitbox entity)
+(defun-scaled player-attackbox-width 20)
+(defun-scaled player-attackbox-height 6)
+(defun-scaled player-attackbox-x-offset 10)
+(defun-scaled player-attackbox-y-offset 3)
+
+(defclass player (attackbox hitbox entity)
   ((delta-y :initform 0.0 :accessor delta-y))
   (:default-initargs
    :width (player-width)
-   :height (player-height)))
+   :height (player-height)
+   :attackbox-width    (player-attackbox-width)
+   :attackbox-height   (player-attackbox-height)
+   :attackbox-x-offset (player-attackbox-x-offset)
+   :attackbox-y-offset (player-attackbox-y-offset)))
 
 (defun l/r-input ()
   (- (if (sdl2:keyboard-state-p :scancode-right)
@@ -26,6 +35,19 @@
      (if (sdl2:keyboard-state-p :scancode-up)
          1
          0)))
+
+(defmethod entity-step! (level (player player) (state (eql :attack)) dticks)
+  (cond ((not (sdl2:keyboard-state-p :scancode-space))
+         (setf (get-state player) :idle)
+         (start-animation! player :idle))
+        ((= 1 (get-frame (get-animation player)))
+         (dolist (entity (entities level))
+           (when (and (get-state entity)
+                      (can-attack? player entity)
+                      (not (member (get-state entity) '(:hit :dying))))
+             (hit! entity)
+             (return nil))))
+        (t nil)))
 
 (defun gravity () (scalef .001))
 
@@ -53,6 +75,9 @@
     (cond ((not (entity-supported? level player))
            (setf (get-state player) :falling)
            (start-animation! player :falling))
+          ((sdl2:keyboard-state-p :scancode-space)
+           (setf (get-state player) :attack)
+           (start-animation! player :attack1))
           ((sdl2:keyboard-state-p :scancode-up)
            (setf (get-state player) :jumping)
            (start-animation! player :jumping))
@@ -101,6 +126,9 @@
     (cond ((not (entity-supported? level player))
            (setf (get-state player) :falling)
            (start-animation! player :falling))
+          ((sdl2:keyboard-state-p :scancode-space)
+           (setf (get-state player) :attack)
+           (start-animation! player :attack1))
           ((sdl2:keyboard-state-p :scancode-up)
            (setf (get-state player) :jumping)
            (start-animation! player :jumping))
