@@ -8,7 +8,7 @@
 
 (defclass button (hitbox entity)
   ((action :initarg :action
-           :initform (lambda (button) (format t "~&Unimplemented button.~%"))
+           :initform (lambda (button) (declare (ignore button)) (format t "~&Unimplemented button.~%"))
            :reader action)))
 
 (defmethod entity-step! (level (button button) (state (eql :idle)) dticks)

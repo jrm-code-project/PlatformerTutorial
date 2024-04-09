@@ -30,16 +30,16 @@
    (height :initarg :height :reader get-height)))
 
 (defun get-left (entity)
-  (floor (- (get-x entity) (/ (get-width entity) 2))))
+  (- (get-x entity) (/ (get-width entity) 2)))
 
 (defun get-right (entity)
-  (floor (+ (get-x entity) (/ (get-width entity) 2))))
+  (+ (get-x entity) (/ (get-width entity) 2)))
 
 (defun get-top (entity)
-  (floor (- (get-y entity) (get-height entity))))
+  (- (get-y entity) (get-height entity)))
 
 (defun get-bottom (entity)
-  (floor (get-y entity)))
+  (get-y entity))
 
 (defun entity-under-point? (entity x y)
   (and (>= x (get-left entity))
@@ -58,60 +58,27 @@
                          (get-height entity)))
       (sdl2:render-draw-rect renderer r))))
 
-(defun coord->tile (x y)
-  (values (floor x (tile-size)) (floor y (tile-size))))
-
-(defun point-supported? (level x y)
-  (multiple-value-bind (tile-x tile-y) (coord->tile x (+ y 1))
-    (not (blank-tile? level tile-x tile-y))))
-
 (defun entity-supported? (level entity)
   (or (point-supported? level (get-left entity) (get-bottom entity))
       (point-supported? level (get-right entity) (get-bottom entity))))
 
-(defun point-covered? (level x y)
-  (multiple-value-bind (tile-x tile-y) (coord->tile x (- y 1))
-    (not (blank-tile? level tile-x tile-y))))
-
 (defun entity-covered? (level entity)
   (or (point-covered? level (get-left entity) (get-top entity))
-      (point-covered? level (get-left entity) (get-top entity))))
+      (point-covered? level (get-right entity) (get-top entity))))
 
-(defun tile-left (tile-x)
-  (* tile-x (tile-size)))
+(defun against-left-wall? (level entity)
+  (or (point-against-left-wall? level (get-left entity) (get-top entity))
+      (point-against-left-wall? level (get-left entity) (get-bottom entity))))
 
-(defun tile-right (tile-x)
-  (- (* (+ tile-x 1) (tile-size)) 1))
+(defun against-right-wall? (level entity)
+  (or (point-against-right-wall? level (get-right entity) (get-top entity))
+      (point-against-right-wall? level (get-right entity) (get-bottom entity))))
 
-(defun tile-top (tile-y)
-  (* tile-y (tile-size)))
+(defun unsupported-on-left? (level entity)
+  (not (point-supported? level (get-left entity) (get-bottom entity))))
 
-(defun tile-bottom (tile-y)
-  (- (* (+ tile-y 1) (tile-size)) 1))
-
-(defun move-point-left (level x y dx)
-  (multiple-value-bind (tile-x tile-y) (coord->tile (+ x dx) y)
-    (if (blank-tile? level tile-x tile-y)
-        (+ x dx)
-        (tile-left (+ tile-x 1)))))
-
-(defun move-point-right (level x y dx)
-  (multiple-value-bind (tile-x tile-y) (coord->tile (+ x dx) y)
-    (if (blank-tile? level tile-x tile-y)
-        (+ x dx)
-        (tile-right (- tile-x 1)))))
-
-(defun move-point-down (level x y dy)
-  (multiple-value-bind (tile-x tile-y) (coord->tile x (+ y dy))
-    (if (blank-tile? level tile-x tile-y)
-        (+ y dy)
-        (tile-bottom (- tile-y 1)))))
-
-(defun move-point-up (level x y dy)
-  (multiple-value-bind (tile-x tile-y) (coord->tile x (+ y dy))
-    (if (blank-tile? level tile-x tile-y)
-        (+ y dy)
-        (tile-top (+ tile-y 1)))))
+(defun unsupported-on-right? (level entity)
+  (not (point-supported? level (get-right entity) (get-bottom entity))))
 
 (defun move-entity-left! (level entity dx)
   (let ((x1 (move-point-left level
@@ -122,7 +89,7 @@
                               (get-left entity)
                               (get-bottom entity)
                               dx)))
-    (setf (get-x entity) (+ (max x1 x2) (floor (get-width entity) 2)))))
+    (setf (get-x entity) (+ (max x1 x2) (/ (get-width entity) 2)))))
 
 (defun move-entity-right! (level entity dx)
   (let ((x1 (move-point-right level
@@ -133,7 +100,7 @@
                                (get-right entity)
                                (get-bottom entity)
                                dx)))
-    (setf (get-x entity) (- (min x1 x2) (floor (get-width entity) 2)))))
+    (setf (get-x entity) (- (min x1 x2) (/ (get-width entity) 2)))))
 
 (defun move-entity-horizontally! (level entity dx)
   (cond ((< dx 0) (move-entity-left! level entity dx))

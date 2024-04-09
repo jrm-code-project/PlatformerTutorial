@@ -297,14 +297,14 @@
                 (make-instance 'level
                                :tiles level-tiles
                                :player player
-                               :entities entities))
+                               :entities (cons player entities)))
              ,@resources))
 
          (make-menu (resources)
            `(:menu
              ,(make-instance
                'menu
-               :buttons
+               :entities
                (let* ((texture (get-resource '(:textures :button-atlas) resources))
                       (button-height (scale (floor (sdl2:texture-height texture) 3)))
                       (button-width  (scale (floor (sdl2:texture-width texture) 3))))
@@ -318,7 +318,7 @@
                                  :animation (funcall (get-resource '(:animations :button :play) resources))
                                  :action (lambda (button)
                                            (declare (ignore button))
-                                           (setf (level game) (first-level game))))
+                                           (setf (mode game) (first-level game))))
                   (make-instance 'button
                                  :x (/ (game-width) 2)
                                  :y (options-button-y)
@@ -342,7 +342,7 @@
            `(:pause-menu
              ,(make-instance
                'pause-menu
-               :buttons
+               :entities
                (let* ((urm-texture (get-resource '(:textures :urm-button-atlas) resources))
                       (urm-button-width (scale (floor (sdl2:texture-width urm-texture) 3)))
                       (urm-button-height (scale (floor (sdl2:texture-width urm-texture) 3)))
@@ -399,7 +399,7 @@
                    :animation (funcall (get-resource '(:animations :urm-buttons :menu) resources))
                    :action (lambda (button)
                              (declare (ignore button))
-                             (setf (level game) (menu game))))
+                             (setf (mode game) (menu game))))
                   (make-instance
                    'button :x (restart-button-position-x)
                    :y (restart-button-position-y)
@@ -409,7 +409,7 @@
                    :animation (funcall (get-resource '(:animations :urm-buttons :restart) resources))
                    :action (lambda (button)
                              (declare (ignore button))
-                             (setf (level game) (first-level game))))
+                             (setf (mode game) (first-level game))))
                   (make-instance
                    'button :x (resume-button-position-x)
                    :y (resume-button-position-y)
@@ -419,7 +419,7 @@
                    :animation (funcall (get-resource '(:animations :urm-buttons :resume) resources))
                    :action (lambda (button)
                              (declare (ignore button))
-                             (setf (level game) (first-level game))))
+                             (setf (mode game) (level game))))
                   )))
              ,@resources)))
 

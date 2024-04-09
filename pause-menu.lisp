@@ -13,10 +13,10 @@
 (defun-scaled menu-button-position-x 341)
 (defun-scaled menu-button-position-y 381)
 
-(defun-scaled restart-button-position-x 387)
+(defun-scaled restart-button-position-x 415)
 (defun-scaled restart-button-position-y 381)
 
-(defun-scaled resume-button-position-x 462)
+(defun-scaled resume-button-position-x 490)
 (defun-scaled resume-button-position-y 381)
 
 (defun-scaled volume-slider-width 28)
@@ -25,21 +25,10 @@
 (defun base-volume-slider-background-offset () (* 28 3))
 (defun-scaled volume-slider-background-width 215)
 
-(defclass pause-menu ()
-  ((buttons :initarg :buttons :reader get-buttons)))
+(defclass pause-menu (mode)
+  ())
 
-(defmethod level-step! (game (pause-menu pause-menu) dticks)
-  (map nil (lambda (button)
-             (entity-step! pause-menu button (get-state button) dticks))
-       (get-buttons pause-menu)))
-
-(defun render-pause-menu! (renderer resources pause-menu)
-  (let ((*world-x-offset* 0))
-    (map nil (lambda (button)
-               (render-entity! renderer resources button))
-         (get-buttons pause-menu))))
-
-(defmethod render-level! (renderer resources game (pause-menu pause-menu))
+(defmethod render-mode! (renderer resources game (pause-menu pause-menu))
   (let ((background-texture (get-resource '(:textures :pause-menu) resources)))
     (sdl2:with-rects ((src 0
                            0
@@ -62,4 +51,5 @@
                            (volume-slider-height)))
       (sdl2:render-copy renderer slider-background :source-rect src :dest-rect dst)))
 
-  (render-pause-menu! renderer resources pause-menu))
+  (let ((*world-x-offset* 0))
+    (call-next-method)))
