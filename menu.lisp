@@ -34,3 +34,41 @@
                             
   (let ((*world-x-offset* 0))
     (call-next-method)))
+
+(defun make-menu (resources)
+  `(:menu
+    ,(make-instance
+      'menu
+      :entities
+      (let* ((texture (get-resource '(:textures :button-atlas) resources))
+             (button-height (scale (floor (sdl2:texture-height texture) 3)))
+             (button-width  (scale (floor (sdl2:texture-width texture) 3))))
+        (list
+         (make-instance 'button
+                        :x (/ (game-width) 2)
+                        :y (play-button-y)
+                        :height button-height
+                        :width button-width
+                        :state :idle
+                        :animation (funcall (get-resource '(:animations :button :play) resources))
+                        :action (lambda (game button)
+                                  (declare (ignore button))
+                                  (setf (mode game) (first-level game))))
+         (make-instance 'button
+                        :x (/ (game-width) 2)
+                        :y (options-button-y)
+                        :height button-height
+                        :width button-width
+                        :state :idle
+                        :animation (funcall (get-resource '(:animations :button :options) resources)))
+         (make-instance 'button
+                        :x (/ (game-width) 2)
+                        :y (quit-button-y)
+                        :height button-height
+                        :width button-width
+                        :state :idle
+                        :animation (funcall (get-resource '(:animations :button :quit) resources))
+                        :action (lambda (game button)
+                                  (declare (ignore button game))
+                                  (sdl2:push-quit-event))))))
+    ,@resources))

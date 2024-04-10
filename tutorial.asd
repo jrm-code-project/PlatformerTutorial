@@ -31,6 +31,10 @@
                                           "parameters"
                                           "resource"
                                           "texture"))
+               (:file "game-over" :depends-on ("level"
+                                               "macros"
+                                               "mode"
+                                               "package"))
                (:file "level"    :depends-on ("game"
                                               "macros"
                                               "mode"

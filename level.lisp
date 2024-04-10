@@ -6,6 +6,13 @@
 (defun-scaled small-cloud-minimum-y 80)
 (defun-scaled small-cloud-maximum-y 175)
 
+(defun-scaled health-bar-x 10)
+(defun-scaled health-bar-y 10)
+(defun-scaled health-offset-x 34)
+(defun-scaled health-offset-y 14)
+(defun-scaled health-bar-width 150)
+(defun-scaled health-bar-height 4)
+
 (defclass level (mode)
   ((player   :initarg :player   :accessor player)
    (tiles    :initarg :tiles    :accessor tiles)
@@ -17,15 +24,6 @@
                        (i 0 (1+ i)))
                       ((>= i 10) l))
                   :reader get-cloud-heights)))
-
-(defun level-tiles-width (level-tiles)
-  (array-dimension level-tiles 0))
-
-(defun level-tiles-height (level-tiles)
-  (array-dimension level-tiles 1))
-
-(defun level-width (level)
-  (* (level-tiles-width (tiles level)) (tile-size)))
 
 (defun render-big-clouds! (renderer big-cloud-texture)
   (dotimes (i 3)
@@ -54,6 +52,29 @@
                          (sdl2:texture-height level-background-texture))
                     (dst 0 0 (game-width) (game-height)))
     (sdl2:render-copy renderer level-background-texture :source-rect src :dest-rect dst)))
+
+(defun render-health-bar! (renderer health-bar-texture player)
+  (sdl2:with-rects ((src 0 0 (sdl2:texture-width health-bar-texture) (sdl2:texture-height health-bar-texture))
+                    (dst (health-bar-x)
+                         (health-bar-y)
+                         (scale (sdl2:texture-width health-bar-texture))
+                         (scale (sdl2:texture-height health-bar-texture))))
+    (sdl2:render-copy renderer health-bar-texture :source-rect src :dest-rect dst))
+  (sdl2:with-rects ((src (+ (health-offset-x) (health-bar-x))
+                         (+ (health-offset-y) (health-bar-y))
+                         (floor (* (health-bar-width) (/ (get-health player) 100)))
+                         (health-bar-height)))
+    (sdl2:set-render-draw-color renderer #xff #x00 #x00 #xff)
+    (sdl2:render-fill-rect renderer src)))
+
+(defun level-tiles-width (level-tiles)
+  (array-dimension level-tiles 0))
+
+(defun level-tiles-height (level-tiles)
+  (array-dimension level-tiles 1))
+
+(defun level-width (level)
+  (* (level-tiles-width (tiles level)) (tile-size)))
 
 (defparameter *render-tile-outline* nil)
 
@@ -98,6 +119,7 @@
   (render-big-clouds! renderer (get-resource '(:textures :big-clouds) resources))
   (render-small-clouds! renderer (get-resource '(:textures :small-clouds) resources) (get-cloud-heights level))
   (render-tiles! renderer (get-resource '(:textures :outside) resources) (tiles level))
+  (render-health-bar! renderer (get-resource '(:textures :health-bar) resources) (player level))
   (call-next-method))
 
 (defmethod mode-step! (game (level level) dticks)
@@ -107,12 +129,12 @@
          (setf (mode game) (paused-menu game)))
         (t (call-next-method))))
 
-(defun blank-tile? (level tile-y tile-x)
+(defun blank-tile? (level tile-x tile-y)
   (and (>= tile-x 0)
-       (< tile-x (array-dimension (tiles level) 1))
+       (< tile-x (level-tiles-width (tiles level)))
        (>= tile-y 0)
-       (< tile-y (array-dimension (tiles level) 0))
-       (= 11 (aref (tiles level) tile-y tile-x 0))))
+       (< tile-y (level-tiles-height (tiles level)))
+       (= 11 (aref (tiles level) tile-x tile-y 0))))
 
 (defun coord->tile (x y)
   (values (floor x (tile-size)) (floor y (tile-size))))
@@ -169,3 +191,32 @@
         (+ y dy)
         (tile-top (+ tile-y 1)))))
 
+(defun make-level (resources)
+  `(:level
+    ,(let ((player nil)
+           (entities nil)
+           (level-tiles (car (read-level-data))))
+       (dotimes (i (level-tiles-width level-tiles))
+         (dotimes (j (level-tiles-height level-tiles))
+           (cond ((= 100 (aref level-tiles i j 1))
+                  (setq player
+                        (make-instance 'player
+                                       :x (+ (/ (tile-size) 2) (* i (tile-size)))
+                                       :y (- (* (+ j 1) (tile-size)) 1)
+                                       :state :idle
+                                       :animation (funcall (get-resource '(:animations :player :idle) resources))
+                                       :animations (get-resource '(:animations :player) resources))))
+                 ((zerop (aref level-tiles i j 1))
+                  (push (make-instance 'crabby
+                                       :x (+ (/ (tile-size) 2) (* i (tile-size)))
+                                       :y (- (* (+ j 1) (tile-size)) 1)
+                                       :state :idle
+                                       :animation (funcall (get-resource '(:animations :crabby :idle) resources))
+                                       :animations (get-resource '(:animations :crabby) resources))
+                        entities))
+                 (t nil))))
+       (make-instance 'level
+                      :tiles level-tiles
+                      :player player
+                      :entities (cons player entities)))
+    ,@resources))

@@ -3,7 +3,7 @@
 (in-package "TUTORIAL")
 
 (defclass mode ()
-  ((entities :initarg :entities :reader entities)))
+  ((entities :initform nil :initarg :entities :reader entities)))
 
 (defgeneric render-mode! (renderer resources game mode)
   (:method (renderer resources game (mode mode))
@@ -15,4 +15,4 @@
   (:method (game (mode mode) dticks)
     (dolist (entity (entities mode))
       (when (get-state entity)
-        (entity-step! mode entity (get-state entity) dticks)))))
+        (entity-step! game mode entity (get-state entity) dticks)))))

@@ -116,6 +116,7 @@
   (let-surfaces ((big-clouds-surface          (resource-pathname "big_clouds.png"))
                  (button-atlas-surface        (resource-pathname "button_atlas.png"))
                  (crabby-atlas-surface        (resource-pathname "crabby_sprite.png"))
+                 (health-bar-surface          (resource-pathname "health_power_bar.png"))
                  (menu-surface                (resource-pathname "menu_background.png"))
                  (menu-background-surface     (resource-pathname "background_menu.png"))
                  (outside-sprites-surface     (resource-pathname "outside_sprites.png"))
@@ -126,341 +127,66 @@
                  (sound-button-atlas-surface  (resource-pathname "sound_button.png"))
                  (urm-button-atlas-surface    (resource-pathname "urm_buttons.png"))
                  (volume-button-atlas-surface (resource-pathname "volume_buttons.png")))
-    (funcall receiver
-             `(:big-clouds          ,big-clouds-surface
-               :button-atlas        ,button-atlas-surface
-               :crabby-atlas        ,crabby-atlas-surface
-               :menu                ,menu-surface
-               :menu-background     ,menu-background-surface
-               :outside             ,outside-sprites-surface
-               :pause-menu          ,pause-menu-surface
-               :player              ,player-sprites-surface
-               :playing-background  ,playing-background-surface
-               :small-clouds        ,small-clouds-surface
-               :sound-button-atlas  ,sound-button-atlas-surface
-               :urm-button-atlas    ,urm-button-atlas-surface
-               :volume-button-atlas ,volume-button-atlas-surface))))
-
-(defun button-animation (sprite-sheet row)
-  (let ((frame-set (make-instance 'frame-set
-                                  :sprite-sheet sprite-sheet
-                                  :row row
-                                  :ticks-per-frame most-positive-fixnum)))
-    (lambda ()
-      (make-instance 'slides
-                      :frame-set frame-set
-                      :current-slide :idle
-                      :slides #(:idle :hover :pressed)))))
-
-(defun frame-loop-animation (sprite-sheet row)
-  (let ((frame-set (make-instance 'frame-set
-                                  :sprite-sheet sprite-sheet
-                                  :row row
-                                  :ticks-per-frame 100)))
-    (lambda ()
-      (make-instance 'frame-loop :frame-set frame-set))))
-
-(defun one-shot-animation (sprite-sheet row)
-  (let ((frame-set (make-instance 'frame-set
-                                  :sprite-sheet sprite-sheet
-                                  :row row
-                                  :ticks-per-frame 100)))
-    (lambda ()
-      (make-instance 'one-shot :frame-set frame-set))))
+    (with-open-font (font (text-font) 80)
+      (with-rendered-text (game-over-surface font "Game Over" #xff #xFF #xFF #xFF)
+        (funcall receiver
+                 `(:big-clouds          ,big-clouds-surface
+                   :button-atlas        ,button-atlas-surface
+                   :crabby-atlas        ,crabby-atlas-surface
+                   :game-over           ,game-over-surface
+                   :health-bar          ,health-bar-surface
+                   :menu                ,menu-surface
+                   :menu-background     ,menu-background-surface
+                   :outside             ,outside-sprites-surface
+                   :pause-menu          ,pause-menu-surface
+                   :player              ,player-sprites-surface
+                   :playing-background  ,playing-background-surface
+                   :small-clouds        ,small-clouds-surface
+                   :sound-button-atlas  ,sound-button-atlas-surface
+                   :urm-button-atlas    ,urm-button-atlas-surface
+                   :volume-button-atlas ,volume-button-atlas-surface))))))
 
 (defmethod call-with-resources ((game platformer) surfaces renderer receiver)
-  (flet ((make-animations (resources)
-           `(:animations
-             (:button
-              ,(let ((button-atlas
-                       (make-sprite-sheet (lambda (textures) (getf textures :button-atlas))
-                                          (getf resources :textures)
-                                          #(:play
-                                            :options
-                                            :quit)
-                                          #(3 3 3))))
-                 `(:play
-                   ,(button-animation button-atlas :play)
-                   :options
-                   ,(button-animation button-atlas :options)
-                   :quit
-                   ,(button-animation button-atlas :quit)))
-              :crabby
-              ,(let ((crabby-sprite-sheet
-                       (make-sprite-sheet (lambda (textures) (getf textures :crabby))
-                                          (getf resources :textures)
-                                          #(:idle
-                                            :running
-                                            :attack
-                                            :hit
-                                            :dying)
-                                          #(9 6 7 4 5)
-                                          :baseline-offset 4)))
-                 `(:attack
-                   ,(frame-loop-animation crabby-sprite-sheet :attack)
-                   :dying
-                   ,(frame-loop-animation crabby-sprite-sheet :dying)
-                   :hit
-                   ,(frame-loop-animation crabby-sprite-sheet :hit)                                            
-                   :idle
-                   ,(frame-loop-animation crabby-sprite-sheet :idle)                                            
-                   :running
-                   ,(frame-loop-animation crabby-sprite-sheet :running)))
-              :player
-              ,(let ((player-sprite-sheet
-                       (make-sprite-sheet (lambda (textures) (getf textures :player))
-                                          (getf resources :textures)
-                                          #(:idle
-                                            :running
-                                            :jumping
-                                            :falling
-                                            :landing
-                                            :hit
-                                            :attack1
-                                            :attack2
-                                            :attack3)
-                                          #(5 6 3 1 2 4 3 3 3)
-                                          :baseline-offset 9)))
-                 `(:attack1
-                   ,(frame-loop-animation player-sprite-sheet :attack1)
-                   :falling
-                   ,(frame-loop-animation player-sprite-sheet :falling)
-                   :idle
-                   ,(frame-loop-animation player-sprite-sheet :idle)
-                   :jumping
-                   ,(one-shot-animation player-sprite-sheet :jumping)
-                   :landing
-                   ,(one-shot-animation player-sprite-sheet :landing)
-                   :running
-                   ,(frame-loop-animation player-sprite-sheet :running)))
-              :sound-buttons
-              ,(let ((button-atlas
-                       (make-sprite-sheet (lambda (textures) (getf textures :sound-button-atlas))
-                                          (getf resources :textures)
-                                          #(:on
-                                            :off)
-                                          #(3 3))))
-                 `(:on
-                   ,(button-animation button-atlas :on)
-                   :off
-                   ,(button-animation button-atlas :off)))
-
-              :urm-buttons
-              ,(let ((button-atlas
-                       (make-sprite-sheet (lambda (textures) (getf textures :urm-button-atlas))
-                                          (getf resources :textures)
-                                          #(:resume
-                                            :restart
-                                            :menu)
-                                          #(3 3 3))))
-                 `(:menu
-                   ,(button-animation button-atlas :menu)
-                   :restart
-                   ,(button-animation button-atlas :restart)
-                   :resume
-                   ,(button-animation button-atlas :resume)))
-              :volume-button
-              ,(let ((button-atlas
-                       (make-instance 'sprite-sheet
-                                      :selector (lambda (textures) (getf textures :volume-button-atlas))
-                                      :frame-width (base-volume-slider-width)
-                                      :frame-height (sdl2:texture-height
-                                                     (get-resource '(:textures :volume-button-atlas) resources))
-                                      :baseline-offset 0
-                                      :rows #(:volume)
-                                      :row-limits #(3))))
-                 `(:slider
-                   ,(button-animation button-atlas :volume))))
-             ,@resources))
-
-         (make-level (resources)
-           `(:level
-             ,(let ((player nil)
-                    (entities nil)
-                    (level-tiles (car (read-level-data))))
-                (dotimes (i (level-tiles-width level-tiles))
-                  (dotimes (j (level-tiles-height level-tiles))
-                    (cond ((= 100 (aref level-tiles i j 1))
-                           (setq player
-                                 (make-instance 'player
-                                           :x (+ (/ (tile-size) 2) (* i (tile-size)))
-                                           :y (- (* (+ j 1) (tile-size)) 1)
-                                           :state :idle
-                                           :animation (funcall (get-resource '(:animations :player :idle) resources))
-                                           :animations (get-resource '(:animations :player) resources))))
-                          ((zerop (aref level-tiles i j 1))
-                           (push (make-instance 'crabby
-                                                :x (+ (/ (tile-size) 2) (* i (tile-size)))
-                                                :y (- (* (+ j 1) (tile-size)) 1)
-                                                :state :idle
-                                                :animation (funcall (get-resource '(:animations :crabby :idle) resources))
-                                                :animations (get-resource '(:animations :crabby) resources))
-                                 entities))
-                          (t nil))))
-                (make-instance 'level
-                               :tiles level-tiles
-                               :player player
-                               :entities (cons player entities)))
-             ,@resources))
-
-         (make-menu (resources)
-           `(:menu
-             ,(make-instance
-               'menu
-               :entities
-               (let* ((texture (get-resource '(:textures :button-atlas) resources))
-                      (button-height (scale (floor (sdl2:texture-height texture) 3)))
-                      (button-width  (scale (floor (sdl2:texture-width texture) 3))))
-                 (list
-                  (make-instance 'button
-                                 :x (/ (game-width) 2)
-                                 :y (play-button-y)
-                                 :height button-height
-                                 :width button-width
-                                 :state :idle
-                                 :animation (funcall (get-resource '(:animations :button :play) resources))
-                                 :action (lambda (button)
-                                           (declare (ignore button))
-                                           (setf (mode game) (first-level game))))
-                  (make-instance 'button
-                                 :x (/ (game-width) 2)
-                                 :y (options-button-y)
-                                 :height button-height
-                                 :width button-width
-                                 :state :idle
-                                 :animation (funcall (get-resource '(:animations :button :options) resources)))
-                  (make-instance 'button
-                                 :x (/ (game-width) 2)
-                                 :y (quit-button-y)
-                                 :height button-height
-                                 :width button-width
-                                 :state :idle
-                                 :animation (funcall (get-resource '(:animations :button :quit) resources))
-                                 :action (lambda (button)
-                                           (declare (ignore button))
-                                           (sdl2:push-quit-event))))))
-             ,@resources))
-
-         (make-pause-menu (resources)
-           `(:pause-menu
-             ,(make-instance
-               'pause-menu
-               :entities
-               (let* ((urm-texture (get-resource '(:textures :urm-button-atlas) resources))
-                      (urm-button-width (scale (floor (sdl2:texture-width urm-texture) 3)))
-                      (urm-button-height (scale (floor (sdl2:texture-width urm-texture) 3)))
-                      (sound-texture (get-resource '(:textures :sound-button-atlas) resources))
-                      (sound-button-height (scale (floor (sdl2:texture-height sound-texture) 2)))
-                      (sound-button-width  (scale (floor (sdl2:texture-width sound-texture) 3)))
-                      (volume-texture (get-resource '(:textures :volume-button-atlas) resources))
-                      (volume-slider-height (scale (sdl2:texture-height volume-texture)))
-                      )
-                 (list
-                  (make-instance
-                   'button :x (music-button-position-x)
-                   :y (music-button-position-y)
-                   :height sound-button-height
-                   :width sound-button-width
-                   :state :idle
-                   :animation (funcall (get-resource '(:animations :sound-buttons :on) resources))
-                   :animations (get-resource '(:animations :sound-buttons) resources)
-                   :action (lambda (button)
-                             (cond ((eql (get-row (frame-set (get-animation button))) :on)
-                                    (setf (get-animation button) (funcall (getf (animations button) :off))))
-                                   ((eql (get-row (frame-set (get-animation button))) :off)
-                                    (setf (get-animation button) (funcall (getf (animations button) :on))))
-                                   (t nil))))
-                  (make-instance
-                   'button :x (sfx-button-position-x)
-                   :y (sfx-button-position-y)
-                   :height sound-button-height
-                   :width sound-button-width
-                   :state :idle
-                   :animation (funcall (get-resource '(:animations :sound-buttons :on) resources))
-                   :animations (get-resource '(:animations :sound-buttons) resources)
-                   :action (lambda (button)
-                             (cond ((eql (get-row (frame-set (get-animation button))) :on)
-                                    (setf (get-animation button) (funcall (getf (animations button) :off))))
-                                   ((eql (get-row (frame-set (get-animation button))) :off)
-                                    (setf (get-animation button) (funcall (getf (animations button) :on))))
-                                   (t nil))))
-                  (make-instance
-                   'slider :x (/ (game-width) 2)
-                   :y (volume-slider-y)
-                   :height volume-slider-height
-                   :width (volume-slider-width)
-                   :left-limit (+ (floor (- (game-width) (volume-slider-background-width)) 2) (scale 22))
-                   :right-limit (- (floor (+ (game-width) (volume-slider-background-width)) 2) (scale 22))
-                   :state :idle
-                   :animation (funcall (get-resource '(:animations :volume-button :slider) resources)))
-                  (make-instance
-                   'button :x (menu-button-position-x)
-                   :y (menu-button-position-y)
-                   :height urm-button-height
-                   :width urm-button-width
-                   :state :idle
-                   :animation (funcall (get-resource '(:animations :urm-buttons :menu) resources))
-                   :action (lambda (button)
-                             (declare (ignore button))
-                             (setf (mode game) (menu game))))
-                  (make-instance
-                   'button :x (restart-button-position-x)
-                   :y (restart-button-position-y)
-                   :height urm-button-height
-                   :width urm-button-width
-                   :state :idle
-                   :animation (funcall (get-resource '(:animations :urm-buttons :restart) resources))
-                   :action (lambda (button)
-                             (declare (ignore button))
-                             (setf (mode game) (first-level game))))
-                  (make-instance
-                   'button :x (resume-button-position-x)
-                   :y (resume-button-position-y)
-                   :height urm-button-height
-                   :width urm-button-width
-                   :state :idle
-                   :animation (funcall (get-resource '(:animations :urm-buttons :resume) resources))
-                   :action (lambda (button)
-                             (declare (ignore button))
-                             (setf (mode game) (level game))))
-                  )))
-             ,@resources)))
-
-    (let-texture (renderer
-                  (big-clouds-texture      (getf surfaces :big-clouds))
-                  (button-atlas-texture    (getf surfaces :button-atlas))
-                  (crabby-atlas-texture    (getf surfaces :crabby-atlas))
-                  (menu-texture            (getf surfaces :menu))
-                  (menu-background-texture (getf surfaces :menu-background))
-                  (outside-sprites-texture (getf surfaces :outside))
-                  (pause-menu-texture      (getf surfaces :pause-menu))
-                  (player-sprites-texture  (getf surfaces :player))
-                  (playing-background-texture (getf surfaces :playing-background))
-                  (small-clouds-texture    (getf surfaces :small-clouds))
-                  (sound-atlas-texture     (getf surfaces :sound-button-atlas))
-                  (urm-atlas-texture       (getf surfaces :urm-button-atlas))
-                  (volume-atlas-texture    (getf surfaces :volume-button-atlas)))
-      (fold-left (lambda (resources constructor)
-                   (funcall constructor resources))
-                 `(:textures
-                   (:big-clouds          ,big-clouds-texture
-                    :button-atlas        ,button-atlas-texture
-                    :crabby              ,crabby-atlas-texture
-                    :menu                ,menu-texture
-                    :menu-background     ,menu-background-texture
-                    :outside             ,outside-sprites-texture
-                    :pause-menu          ,pause-menu-texture
-                    :playing-background  ,playing-background-texture
-                    :player              ,player-sprites-texture
-                    :small-clouds        ,small-clouds-texture
-                    :sound-button-atlas  ,sound-atlas-texture
-                    :urm-button-atlas    ,urm-atlas-texture
-                    :volume-button-atlas ,volume-atlas-texture))
-                 (list #'make-animations
-                       #'make-level
-                       #'make-menu
-                       #'make-pause-menu
-                       receiver)))))
+  (let-texture (renderer
+                (big-clouds-texture      (getf surfaces :big-clouds))
+                (button-atlas-texture    (getf surfaces :button-atlas))
+                (crabby-atlas-texture    (getf surfaces :crabby-atlas))
+                (game-over-texture       (getf surfaces :game-over))
+                (health-bar-texture      (getf surfaces :health-bar))
+                (menu-texture            (getf surfaces :menu))
+                (menu-background-texture (getf surfaces :menu-background))
+                (outside-sprites-texture (getf surfaces :outside))
+                (pause-menu-texture      (getf surfaces :pause-menu))
+                (player-sprites-texture  (getf surfaces :player))
+                (playing-background-texture (getf surfaces :playing-background))
+                (small-clouds-texture    (getf surfaces :small-clouds))
+                (sound-atlas-texture     (getf surfaces :sound-button-atlas))
+                (urm-atlas-texture       (getf surfaces :urm-button-atlas))
+                (volume-atlas-texture    (getf surfaces :volume-button-atlas)))
+    (fold-left (lambda (resources constructor)
+                 (funcall constructor resources))
+               `(:textures
+                 (:big-clouds          ,big-clouds-texture
+                  :button-atlas        ,button-atlas-texture
+                  :crabby              ,crabby-atlas-texture
+                  :game-over           ,game-over-texture
+                  :health-bar          ,health-bar-texture
+                  :menu                ,menu-texture
+                  :menu-background     ,menu-background-texture
+                  :outside             ,outside-sprites-texture
+                  :pause-menu          ,pause-menu-texture
+                  :playing-background  ,playing-background-texture
+                  :player              ,player-sprites-texture
+                  :small-clouds        ,small-clouds-texture
+                  :sound-button-atlas  ,sound-atlas-texture
+                  :urm-button-atlas    ,urm-atlas-texture
+                  :volume-button-atlas ,volume-atlas-texture))
+               (list #'make-animations
+                     #'make-level
+                     #'make-menu
+                     #'make-pause-menu
+                     #'make-game-over
+                     receiver))))
 
 (defun main ()
   (let ((game (make-instance 'platformer)))
