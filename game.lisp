@@ -22,6 +22,7 @@
   (:method ((game game) dticks)
     (sb-ext:atomic-incf (car (steps game)))))
 
+(defconstant +ticks-per-second+ 1000)
 (defconstant +steps-per-second+ 200)
 (defconstant +ticks-per-step+ (/ +ticks-per-second+ +steps-per-second+))
 
@@ -52,4 +53,7 @@
       (when thread
         (sb-ext:atomic-incf (car thread-control-cell))
         (bordeaux-threads:join-thread thread)))))
-    
+
+(defmacro with-game-loop ((game) &body body)
+  `(CALL-WITH-GAME-LOOP ,game
+     (LAMBDA () ,@body)))

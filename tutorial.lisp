@@ -2,7 +2,6 @@
 
 (in-package "TUTORIAL")
 
-(defconstant +ticks-per-second+ 1000)
 (defconstant +frames-per-second+ 60)
 (defconstant +ticks-per-frame+ (/ +ticks-per-second+ +frames-per-second+))
 (defconstant +titles-per-second+ 1)
@@ -53,11 +52,9 @@
       (main-event-loop game window renderer))))
 
 (defun run (game)
-  (call-with-game-loop
-   game
-   (lambda ()
+  (with-game-loop (game)
      (sdl2:with-init (:video)
-       (main-window game)))))
+       (main-window game))))
 
 (defclass bouncing-rectangle (game)
   ((x-pos :initform 100 :accessor get-x)
