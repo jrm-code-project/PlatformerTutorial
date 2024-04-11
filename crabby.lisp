@@ -5,10 +5,6 @@
 (defun-scaled crabby-width 26)
 (defun-scaled crabby-height 20)
 (defun crabby-velocity () (scalef 0.05))
-(defun-scaled crabby-attackbox-width 69)
-(defun-scaled crabby-attackbox-height 10)
-(defun-scaled crabby-attackbox-x-offset -35)
-(defun-scaled crabby-attackbox-y-offset 5)
 
 (defclass crabby (enemy)
   ((delta-y :initform 0 :accessor delta-y)
