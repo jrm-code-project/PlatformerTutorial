@@ -45,11 +45,11 @@
                      (t (sleep 0.002)))))
 
       (:keydown (:keysym keysym)
+         (cond ((eql (sdl2:scancode keysym) :scancode-x)
+                (sdl2:push-quit-event))
+               (t
                 (format t "~&Keydown: ~s~%" (sdl2:scancode keysym))
-                (force-output)
-                ;; Quit on escape.
-                (when (eql (sdl2:scancode keysym) :scancode-escape)
-                  (sdl2:push-quit-event)))
+                (force-output))))
 
       (:quit () t)
       )))
