@@ -5,38 +5,25 @@
 (defclass game ()
   ((steps :initform (cons 0 nil) :accessor steps)))
 
-(defgeneric call-with-surfaces (game receiver)
-  (:method (game receiver)
-    (funcall receiver nil)))
+(defun render-game! (renderer game textures)
+  (declare (ignore game))
+  ;; Clear any old image
+  (sdl2:set-render-draw-color renderer #xff #xff #xff #xff)
+  (sdl2:render-clear renderer)
 
-(defmacro with-surfaces ((surfaces game) &body body)
-  `(CALL-WITH-SURFACES
-    ,game
-    (LAMBDA (,surfaces)
-      ,@body)))
+  (let ((sprites (getf textures :player)))
+    (sdl2:with-rects ((src 0
+                           0
+                           (sdl2:texture-width sprites)
+                           (sdl2:texture-height sprites))
+                      (dst 100
+                           100
+                           (sdl2:texture-width sprites)
+                           (sdl2:texture-height sprites)))
+      (sdl2:render-copy renderer sprites :source-rect src :dest-rect dst)))
 
-(defgeneric call-with-textures (game surfaces renderer receiver)
-  (:method (game surfaces renderer receiver)
-    (funcall receiver nil)))
-
-(defmacro with-textures ((textures game surfaces renderer) &body body)
-  `(CALL-WITH-TEXTURES
-    ,game ,surfaces ,renderer
-    (LAMBDA (,textures)
-      ,@body)))
-
-(defgeneric render-game! (renderer game textures)
-  (:method :before (renderer game textures)
-    ;; Clear any old image
-    (sdl2:set-render-draw-color renderer #xff #xff #xff #xff)
-    (sdl2:render-clear renderer))
-
-  (:method (renderer game textures)
-    nil)
-
-  (:method :after (renderer game textures)
-    ;; display image
-    (sdl2:render-present renderer)))
+  ;; display image
+  (sdl2:render-present renderer))
 
 (defgeneric game-step! (game dticks)
   (:method ((game game) dticks)
