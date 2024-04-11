@@ -4,7 +4,6 @@
 
 (defclass game ()
   ((mode        :accessor mode)
-   (game-over   :accessor game-over)
    (level       :accessor level)
    (first-level :accessor first-level)
    (menu        :accessor menu)
@@ -36,8 +35,7 @@
         (paused-menu game) (getf resources :pause-menu)
         (mode game)   (getf resources :menu)
         (level game)  (getf resources :level)
-        (menu game)   (getf resources :menu)
-        (game-over game) (getf resources :game-over)))
+        (menu game)   (getf resources :menu)))
 
 (defun render-game! (renderer game resources)
   ;; Clear any old image

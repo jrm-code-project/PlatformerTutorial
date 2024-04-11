@@ -116,7 +116,6 @@
   (let-surfaces ((big-clouds-surface          (resource-pathname "big_clouds.png"))
                  (button-atlas-surface        (resource-pathname "button_atlas.png"))
                  (crabby-atlas-surface        (resource-pathname "crabby_sprite.png"))
-                 (health-bar-surface          (resource-pathname "health_power_bar.png"))
                  (menu-surface                (resource-pathname "menu_background.png"))
                  (menu-background-surface     (resource-pathname "background_menu.png"))
                  (outside-sprites-surface     (resource-pathname "outside_sprites.png"))
@@ -127,32 +126,26 @@
                  (sound-button-atlas-surface  (resource-pathname "sound_button.png"))
                  (urm-button-atlas-surface    (resource-pathname "urm_buttons.png"))
                  (volume-button-atlas-surface (resource-pathname "volume_buttons.png")))
-    (with-open-font (font (text-font) 80)
-      (with-rendered-text (game-over-surface font "Game Over" #xff #xFF #xFF #xFF)
-        (funcall receiver
-                 `(:big-clouds          ,big-clouds-surface
-                   :button-atlas        ,button-atlas-surface
-                   :crabby-atlas        ,crabby-atlas-surface
-                   :game-over           ,game-over-surface
-                   :health-bar          ,health-bar-surface
-                   :menu                ,menu-surface
-                   :menu-background     ,menu-background-surface
-                   :outside             ,outside-sprites-surface
-                   :pause-menu          ,pause-menu-surface
-                   :player              ,player-sprites-surface
-                   :playing-background  ,playing-background-surface
-                   :small-clouds        ,small-clouds-surface
-                   :sound-button-atlas  ,sound-button-atlas-surface
-                   :urm-button-atlas    ,urm-button-atlas-surface
-                   :volume-button-atlas ,volume-button-atlas-surface))))))
+    (funcall receiver
+             `(:big-clouds          ,big-clouds-surface
+               :button-atlas        ,button-atlas-surface
+               :crabby-atlas        ,crabby-atlas-surface
+               :menu                ,menu-surface
+               :menu-background     ,menu-background-surface
+               :outside             ,outside-sprites-surface
+               :pause-menu          ,pause-menu-surface
+               :player              ,player-sprites-surface
+               :playing-background  ,playing-background-surface
+               :small-clouds        ,small-clouds-surface
+               :sound-button-atlas  ,sound-button-atlas-surface
+               :urm-button-atlas    ,urm-button-atlas-surface
+               :volume-button-atlas ,volume-button-atlas-surface))))
 
 (defmethod call-with-resources ((game platformer) surfaces renderer receiver)
   (let-texture (renderer
                 (big-clouds-texture      (getf surfaces :big-clouds))
                 (button-atlas-texture    (getf surfaces :button-atlas))
                 (crabby-atlas-texture    (getf surfaces :crabby-atlas))
-                (game-over-texture       (getf surfaces :game-over))
-                (health-bar-texture      (getf surfaces :health-bar))
                 (menu-texture            (getf surfaces :menu))
                 (menu-background-texture (getf surfaces :menu-background))
                 (outside-sprites-texture (getf surfaces :outside))
@@ -169,8 +162,6 @@
                  (:big-clouds          ,big-clouds-texture
                   :button-atlas        ,button-atlas-texture
                   :crabby              ,crabby-atlas-texture
-                  :game-over           ,game-over-texture
-                  :health-bar          ,health-bar-texture
                   :menu                ,menu-texture
                   :menu-background     ,menu-background-texture
                   :outside             ,outside-sprites-texture
@@ -185,7 +176,6 @@
                      #'make-level
                      #'make-menu
                      #'make-pause-menu
-                     #'make-game-over
                      receiver))))
 
 (defun main ()

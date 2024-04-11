@@ -16,14 +16,7 @@
   (:default-initargs
    :width (crabby-width)
    :height (crabby-height)
-   :attackbox-x-offset (crabby-attackbox-x-offset)
-   :attackbox-y-offset (crabby-attackbox-y-offset)
-   :attackbox-width (crabby-attackbox-width)
-   :attackbox-height (crabby-attackbox-height)
    :initial-health 20))
-
-(defmethod (setf get-state) :after ((state (eql :attack)) (crabby crabby))
-  (start-animation! crabby :attack))
 
 (defmethod (setf get-state) :after ((state (eql :dying)) (crabby crabby))
   (start-animation! crabby :dying))
@@ -36,15 +29,6 @@
 
 (defmethod (setf get-state) :after ((state (eql :running)) (crabby crabby))
   (start-animation! crabby :running))
-
-(defmethod entity-step! (game level (crabby crabby) (state (eql :attack)) dticks)
-  (cond ((animation-finished? (get-animation crabby))
-         (setf (get-state crabby) :idle))
-        ((= 3 (get-frame (get-animation crabby)))
-         (when (can-attack? crabby (player level))
-           (unless (member (get-state (player level)) '(:hit))
-             (hit! (player level)))))
-        (t nil)))
 
 (defmethod entity-step! (game level (crabby crabby) (state (eql :dying)) dticks)
   (when (animation-finished? (get-animation crabby))
@@ -92,9 +76,6 @@
         ((or (unsupported-on-right? level crabby)
              (against-right-wall? level crabby))
          (setf (get-x-velocity crabby) (- (crabby-velocity))))
-        ((can-attack? crabby (player level))
-         (setf (get-x-velocity crabby) 0
-               (get-state crabby) :attack))
         ((and (same-level? crabby (player level))
               (within-five-tiles? crabby (player level)))
          (setf (get-x-velocity crabby) (if (< (get-x crabby) (get-x (player level)))

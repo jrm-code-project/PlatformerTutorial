@@ -90,8 +90,6 @@
 
 (defmethod entity-step! (game level (player player) (state (eql :hit)) dticks)
   (when (animation-finished? (get-animation player))
-    (when (not (plusp (get-health player)))
-      (setf (mode game) (game-over game)))
     (setf (get-state player) :idle)))
 
 (defmethod entity-step! (game level (player player) (state (eql :idle)) dticks)
