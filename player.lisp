@@ -27,7 +27,13 @@
          1
          0)))
 
-(defmethod entity-step! ((player player) (state (eql :idle)) dticks)
+(defmethod (setf get-state) :after ((state (eql :idle)) (player player))
+  (start-animation! player :idle))
+
+(defmethod (setf get-state) :after ((state (eql :running)) (player player))
+  (start-animation! player :running))
+
+(defmethod entity-step! (game (player player) (state (eql :idle)) dticks)
   (let ((l/r (l/r-input))
         (u/d (u/d-input)))
 
@@ -36,13 +42,12 @@
            (cond ((< l/r 0) (setf (flip? player) t))
                  ((> l/r 0) (setf (flip? player) nil))
                  (t nil))
-           (setf (get-state player) :running
-                 (get-animation player) (make-instance 'frame-loop :frame-set (getf (frame-sets player) :running))))
+           (setf (get-state player) :running))
           (t nil))))
 
 (defun player-speed () (scalef .2))
 
-(defmethod entity-step! ((player player) (state (eql :running)) dticks)
+(defmethod entity-step! (game (player player) (state (eql :running)) dticks)
   (let* ((l/r (l/r-input))
          (u/d (u/d-input))
          (dx (* (player-speed) l/r dticks))
@@ -57,18 +62,7 @@
       (setf (get-y player) y*))
     (cond ((and (zerop (l/r-input))
                 (zerop (u/d-input)))
-           (setf (get-state player) :idle
-                 (get-animation player) (make-instance 'frame-loop :frame-set (getf (frame-sets player) :idle))))
+           (setf (get-state player) :idle))
           ((< l/r 0) (setf (flip? player) t))
           ((> l/r 0) (setf (flip? player) nil))
           (t nil))))
-
-(defun make-player (resources)
-  `(:player
-    ,(make-instance 'player
-                    :x (scale 50)
-                    :y (scale 50)
-                    :state :idle
-                    :animation (get-resource '(:animations :player :idle) resources)
-                    :animations (get-resource '(:animations :player) resources))
-    ,@resources))
