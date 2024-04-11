@@ -160,8 +160,8 @@
 (defun same-level? (entity-x entity-y)
   (< (abs (- (get-y entity-x) (get-y entity-y))) 5))
 
-(defun within-five-tiles (entity-x entity-y)
-  (< (abs (- (get-x entity-x) (get-x entity-y))) (* 5 tile-size)))
+(defun within-five-tiles? (entity-x entity-y)
+  (< (abs (- (get-x entity-x) (get-x entity-y))) (* 5 (tile-size))))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;;; Attackbox Mix-in
