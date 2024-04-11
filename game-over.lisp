@@ -15,8 +15,7 @@
                            (sdl2:texture-width texture)
                            (sdl2:texture-height texture)))
       (sdl2:render-copy renderer texture :source-rect src :dest-rect dst)))
-  (let ((*world-x-offset* 0))
-    (call-next-method)))
+  (call-next-method))
 
 (defun make-game-over (resources)
   `(:game-over
