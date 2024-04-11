@@ -55,7 +55,7 @@
                      :h (game-height)
                      :flags '(:shown))
     (sdl2:with-renderer (renderer window :index -1 :flags '(:accelerated))
-      (with-resources ((resources) game surfaces renderer)
+      (with-resources (resources game surfaces renderer)
         (initialize-game! game resources)
         (with-game-loop (game)
           (main-event-loop game window renderer resources))))))
@@ -66,5 +66,5 @@
       (main-window game surfaces))))
 
 (defun main ()
-  (let ((game (make-instance 'platformer)))
+  (let ((game (make-instance 'game)))
     (run game)))

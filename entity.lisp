@@ -11,8 +11,8 @@
    (frame-sets :initarg :frame-sets         :reader   frame-sets)
    (flip       :initarg :flip :initform nil :accessor flip?)))
 
-(defgeneric entity-step! (entity state dticks)
-  (:method ((entity entity) state dticks)
+(defgeneric entity-step! (game entity state dticks)
+  (:method (game (entity entity) state dticks)
     nil))
 
 (defgeneric render-entity! (renderer resources entity)

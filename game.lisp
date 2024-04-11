@@ -8,35 +8,26 @@
 
    (steps   :initform (cons 0 nil) :accessor steps)))
 
-
-
-
-
 (defun initialize-game! (game resources)
   (setf (level game)  (getf resources :level)
         (player game) (getf resources :player)))
 
-(defgeneric render-game! (renderer game resources)
-  (:method :before (renderer game resources)
-    ;; Clear any old image
-    (sdl2:set-render-draw-color renderer #xff #xff #xff #xff)
-    (sdl2:render-clear renderer))
+(defun render-game! (renderer game resources)
+  ;; Clear any old image
+  (sdl2:set-render-draw-color renderer #xff #xff #xff #xff)
+  (sdl2:render-clear renderer)
 
-  (:method (renderer game resources)
-    (render-level! renderer resources (level game))
-    (render-entity! renderer resources (player game)))
+  (render-level! renderer resources (level game))
+  (render-entity! renderer resources (player game))
 
-  (:method :after (renderer game resources)
-    ;; display image
-    (sdl2:render-present renderer)))
+  ;; display image
+  (sdl2:render-present renderer))
 
-(defgeneric game-step! (game dticks)
-  (:method ((game game) dticks)
-    (when (slot-boundp game 'player)
-      (entity-step! (player game) (get-state (player game)) dticks)))
+(defun game-step! (game dticks)
+  (when (slot-boundp game 'player)
+    (entity-step! game (player game) (get-state (player game)) dticks))
 
-  (:method :after ((game game) dticks)
-    (sb-ext:atomic-incf (car (steps game)))))
+  (sb-ext:atomic-incf (car (steps game))))
 
 (defconstant +ticks-per-second+ 1000)
 (defconstant +steps-per-second+ 200)
