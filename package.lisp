@@ -1,4 +1,6 @@
 ;;; -*- Lisp -*-
 
 (defpackage "TUTORIAL"
-  (:use "COMMON-LISP"))
+  (:use "COMMON-LISP")
+  (:export "MAIN"))
+

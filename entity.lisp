@@ -41,8 +41,7 @@
     (decf (get-health entity) 10)
     (if (< (get-health entity) 0)
         (setf (get-health entity) 0))
-    (setf (get-state entity) :hit)
-    (start-animation! entity :hit)))
+    (setf (get-state entity) :hit)))
 
 ;;;;;;;;;;;;;;;;;
 ;;; Hitbox Mix-in
@@ -157,6 +156,12 @@
   (cond ((< dy 0) (move-entity-up! level entity dy))
         ((> dy 0) (move-entity-down! level entity dy))
         (t nil)))
+
+(defun same-level? (entity-x entity-y)
+  (< (abs (- (get-y entity-x) (get-y entity-y))) 5))
+
+(defun within-five-tiles (entity-x entity-y)
+  (< (abs (- (get-x entity-x) (get-x entity-y))) (* 5 tile-size)))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;;; Attackbox Mix-in

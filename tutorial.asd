@@ -2,12 +2,16 @@
 
 (defsystem "tutorial"
   :depends-on ("png-read" "sdl2" "sdl2-image" "sdl2-ttf")
-  :components ((:file "animation" :depends-on ("macros"
+  :components ((:file "animation" :depends-on ("atlas"
+                                               "macros"
                                                "package"
                                                "parameters"
                                                "resource"
-                                               "texture"
-                                               "sprites"))
+                                               "texture"))
+               (:file "atlas"    :depends-on ("macros"
+                                              "package"
+                                              "parameters"
+                                              "texture"))
                (:file "button"   :depends-on ("animation"
                                               "entity"
                                               "macros"
@@ -69,10 +73,6 @@
                                               "package"
                                               "parameters"))
                (:file "resource" :depends-on ("package"))
-               (:file "sprites"  :depends-on ("macros"
-                                              "package"
-                                              "parameters"
-                                              "texture"))
                (:file "texture"  :depends-on ("package"
                                               "resource"))
                (:file "tutorial" :depends-on ("animation"

@@ -28,7 +28,7 @@
 (defmethod (setf get-state) :after ((state (eql :dying)) (crabby crabby))
   (start-animation! crabby :dying))
 
-(defmethod (setf get-state) :hit ((state (eql :hit)) (crabby crabby))
+(defmethod (setf get-state) :after ((state (eql :hit)) (crabby crabby))
   (start-animation! crabby :hit))
 
 (defmethod (setf get-state) :after ((state (eql :idle)) (crabby crabby))
@@ -40,7 +40,7 @@
 (defmethod entity-step! (game level (crabby crabby) (state (eql :attack)) dticks)
   (cond ((animation-finished? (get-animation crabby))
          (setf (get-state crabby) :idle))
-        ((= 4 (get-frame (get-animation crabby)))
+        ((= 3 (get-frame (get-animation crabby)))
          (when (can-attack? crabby (player level))
            (unless (member (get-state (player level)) '(:hit))
              (hit! (player level)))))
@@ -73,8 +73,8 @@
                  (get-state crabby) :falling))
           ((not (plusp (get-health crabby)))
            (setf (get-state crabby) :dying))
-          ((and (< (abs (- (get-y crabby) (get-y player))) (tile-size))
-                (< (abs (- (get-x crabby) (get-x player))) (* 5 (tile-size))))
+          ((and (same-level? crabby player)
+                (within-five-tiles? crabby player))
            (setf (get-state crabby) :running
                  (get-x-velocity crabby) (if (> (get-x crabby) (get-x player))
                                              (- (crabby-velocity))
@@ -87,7 +87,7 @@
          (setf (get-state crabby) :dying
                (get-x-velocity crabby) 0))
         ((or (unsupported-on-left? level crabby)
-            (against-left-wall? level crabby))
+             (against-left-wall? level crabby))
          (setf (get-x-velocity crabby) (crabby-velocity)))
         ((or (unsupported-on-right? level crabby)
              (against-right-wall? level crabby))
@@ -95,14 +95,9 @@
         ((can-attack? crabby (player level))
          (setf (get-x-velocity crabby) 0
                (get-state crabby) :attack))
-        ((and (< (abs (- (get-y crabby) (get-y (player level)))) (tile-size))
-              (> (get-x (player level)) (get-x crabby))
-              (< (- (get-x (player level)) (get-x crabby)) (* 5 (tile-size))))
-         (setf (get-x-velocity crabby) (crabby-velocity)))
-        ((and (< (abs (- (get-y crabby) (get-y (player level)))) (tile-size))
-              (< (get-x (player level)) (get-x crabby))
-              (< (- (get-x crabby) (get-x (player level))) (* 5 (tile-size))))
-         (setf (get-x-velocity crabby) (- (crabby-velocity))))
+        ((and (same-level? crabby (player level))
+              (within-five-tiles? crabby (player level)))
+         (setf (get-x-velocity crabby) (if (< (get-x crabby) (get-x (player level)))
+                                           (crabby-velocity)
+                                           (- (crabby-velocity)))))
         (t nil)))
-
-
