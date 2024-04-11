@@ -34,11 +34,11 @@
                      (t (sleep 0.002)))))
 
       (:keydown (:keysym keysym)
+         (cond ((eql (sdl2:scancode keysym) :scancode-x)
+                (sdl2:push-quit-event))
+               (t
                 (format t "~&Keydown: ~s~%" (sdl2:scancode keysym))
-                (force-output)
-                ;; Quit on escape.
-                (when (eql (sdl2:scancode keysym) :scancode-escape)
-                  (sdl2:push-quit-event)))
+                (force-output))))
 
       (:quit () t)
       )))
@@ -53,36 +53,9 @@
 
 (defun run (game)
   (with-game-loop (game)
-     (sdl2:with-init (:video)
-       (main-window game))))
-
-(defclass bouncing-rectangle (game)
-  ((x-pos :initform 100 :accessor get-x)
-   (y-pos :initform 100 :accessor get-y)
-   (x-vel :initform .25 :accessor get-x-vel)
-   (y-vel :initform .25 :accessor get-y-vel)
-   (width :initform 200 :reader get-rect-width)
-   (height :initform 50 :reader get-rect-height)))
-
-(defmethod render-game! (renderer (game bouncing-rectangle))
-  (sdl2:set-render-draw-color renderer #xff #x00 #x00 #xff)
-  (sdl2:with-rects ((rect (floor (get-x game))
-                          (floor (get-y game))
-                          (get-rect-width game)
-                          (get-rect-height game)))
-    (sdl2:render-fill-rect renderer rect)))
-
-(defmethod game-step! ((game bouncing-rectangle) dticks)
-  (let* ((x-pos* (+ (get-x game) (* dticks (get-x-vel game))))
-         (y-pos* (+ (get-y game) (* dticks (get-y-vel game)))))
-    (cond ((< x-pos* 0) (setf (get-x-vel game) .25))
-          ((> (+ x-pos* (get-rect-width game)) 800) (setf (get-x-vel game) -.25))
-          (t (setf (get-x game) x-pos*)))
-    (cond ((< y-pos* 0) (setf (get-y-vel game) .25))
-          ((> (+ y-pos* (get-rect-height game)) 600) (setf (get-y-vel game) -.25))
-          (t (setf (get-y game) y-pos*)))
-    (call-next-method)))
+    (sdl2:with-init (:video)
+      (main-window game))))
 
 (defun main ()
-  (let ((game (make-instance 'bouncing-rectangle)))
+  (let ((game (make-instance 'game)))
     (run game)))
