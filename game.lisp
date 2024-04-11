@@ -8,25 +8,9 @@
 
    (steps   :initform (cons 0 nil) :accessor steps)))
 
-(defgeneric call-with-surfaces (game receiver)
-  (:method (game receiver)
-    (funcall receiver nil)))
 
-(defmacro with-surfaces ((surfaces game) &body body)
-  `(CALL-WITH-SURFACES
-    ,game
-    (LAMBDA (,surfaces)
-      ,@body)))
 
-(defgeneric call-with-resources (game surfaces renderer receiver)
-  (:method (game surfaces renderer receiver)
-    (funcall receiver nil)))
 
-(defmacro with-resources (((resources) game surfaces renderer) &body body)
-  `(CALL-WITH-RESOURCES
-    ,game ,surfaces ,renderer
-    (LAMBDA (,resources)
-      ,@body)))
 
 (defun initialize-game! (game resources)
   (setf (level game)  (getf resources :level)
@@ -90,3 +74,86 @@
   `(CALL-WITH-GAME-LOOP
     ,game
     (LAMBDA () ,@body)))
+
+(defun call-with-resources (surfaces renderer receiver)
+  (flet ((make-sprite-sheets (resources)
+           `(:sprite-sheets
+             (:player
+              ,(make-sprite-sheet (lambda (textures) (getf textures :player))
+                                  (getf resources :textures)
+                                  #(:idle
+                                    :running
+                                    :jumping
+                                    :falling
+                                    :landing
+                                    :hit
+                                    :attack1
+                                    :attack2
+                                    :attack3)
+                                  #(5 6 3 1 2 4 3 3 3)
+                                  :baseline-offset 8))
+             ,@resources))
+
+         (make-frame-sets (resources)
+           `(:frame-sets
+             (:player
+              (:idle
+               ,(make-instance 'frame-set
+                               :sprite-sheet (get-resource '(:sprite-sheets :player) resources)
+                               :row :idle
+                               :ticks-per-frame 100)
+               :running
+               ,(make-instance 'frame-set
+                               :sprite-sheet (get-resource '(:sprite-sheets :player) resources)
+                               :row :running
+                               :ticks-per-frame 100)))
+             ,@resources))
+
+         (make-animations (resources)
+           `(:animations
+             (:player
+              (:idle
+               ,(make-instance 'frame-loop
+                               :frame-set (get-resource '(:frame-sets :player :idle) resources))
+               :running
+               ,(make-instance 'frame-loop
+                               :frame-set (get-resource '(:frame-sets :player :running) resources))))
+             ,@resources))
+
+         (make-player (resources)
+           `(:player
+             ,(make-instance 'player
+                             :x (scale 50)
+                             :y (scale 50)
+                             :state :idle
+                             :animation (get-resource '(:animations :player :idle) resources)
+                             :frame-sets (get-resource '(:frame-sets :player) resources))
+             ,@resources))
+
+         (make-level (resources)
+           `(:level
+             ,(make-instance 'level
+                             :tiles (car (read-level-data))
+                             :entities '())
+             ,@resources)))
+
+    (let-texture (renderer
+                  (player-sprites-texture (getf surfaces :player))
+                  (outside-sprites-texture (getf surfaces :outside)))
+      (fold-left (lambda (resources constructor)
+                   (funcall constructor resources))
+                 `(:textures
+                   (:outside ,outside-sprites-texture
+                    :player ,player-sprites-texture))
+                 (list #'make-sprite-sheets
+                       #'make-frame-sets
+                       #'make-animations
+                       #'make-player
+                       #'make-level
+                       receiver)))))
+
+(defmacro with-resources (((resources) game surfaces renderer) &body body)
+  `(CALL-WITH-RESOURCES
+    ,game ,surfaces ,renderer
+    (LAMBDA (,resources)
+      ,@body)))

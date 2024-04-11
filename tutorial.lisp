@@ -61,96 +61,9 @@
           (main-event-loop game window renderer resources))))))
 
 (defun run (game)
-  (with-surfaces (surfaces game)
+  (with-surfaces (surfaces)
     (sdl2:with-init (:video)
       (main-window game surfaces))))
-
-(defclass platformer (game)
-  ())
-
-(defmethod call-with-surfaces ((game platformer) receiver)
-  (let-surfaces ((outside-sprites-surface (resource-pathname "outside_sprites.png"))
-                 (player-sprites-surface  (resource-pathname "player_sprites.png")))
-    (funcall receiver
-             `(:outside ,outside-sprites-surface
-               :player  ,player-sprites-surface))))
-
-(defmethod call-with-resources ((game platformer) surfaces renderer receiver)
-  (flet ((make-sprite-sheets (resources)
-           `(:sprite-sheets
-             (:player
-              ,(make-sprite-sheet (lambda (textures) (getf textures :player))
-                                  (getf resources :textures)
-                                  #(:idle
-                                    :running
-                                    :jumping
-                                    :falling
-                                    :landing
-                                    :hit
-                                    :attack1
-                                    :attack2
-                                    :attack3)
-                                  #(5 6 3 1 2 4 3 3 3)
-                                  :baseline-offset 8))
-             ,@resources))
-
-         (make-frame-sets (resources)
-           `(:frame-sets
-             (:player
-              (:idle
-               ,(make-instance 'frame-set
-                               :sprite-sheet (get-resource '(:sprite-sheets :player) resources)
-                               :row :idle
-                               :ticks-per-frame 100)
-               :running
-               ,(make-instance 'frame-set
-                               :sprite-sheet (get-resource '(:sprite-sheets :player) resources)
-                               :row :running
-                               :ticks-per-frame 100)))
-             ,@resources))
-
-         (make-animations (resources)
-           `(:animations
-             (:player
-              (:idle
-               ,(make-instance 'frame-loop
-                               :frame-set (get-resource '(:frame-sets :player :idle) resources))
-               :running
-               ,(make-instance 'frame-loop
-                               :frame-set (get-resource '(:frame-sets :player :running) resources))))
-             ,@resources))
-
-         (make-player (resources)
-           `(:player
-             ,(make-instance 'player
-                             :x (scale 50)
-                             :y (scale 50)
-                             :state :idle
-                             :animation (get-resource '(:animations :player :idle) resources)
-                             :frame-sets (get-resource '(:frame-sets :player) resources))
-             ,@resources))
-
-         (make-level (resources)
-           `(:level
-             ,(make-instance 'level
-                             :tiles (car (read-level-data))
-                             :entities '())
-             ,@resources)))
-
-    (let-texture (renderer
-                  (player-sprites-texture (getf surfaces :player))
-                  (outside-sprites-texture (getf surfaces :outside)))
-      (fold-left (lambda (resources constructor)
-                   (funcall constructor resources))
-                 `(:textures
-                   (:outside ,outside-sprites-texture
-                    :player ,player-sprites-texture))
-                 (list #'make-sprite-sheets
-                       #'make-frame-sets
-                       #'make-animations
-                       #'make-player
-                       #'make-level
-                       receiver)))))
 
 (defun main ()
   (let ((game (make-instance 'platformer)))
