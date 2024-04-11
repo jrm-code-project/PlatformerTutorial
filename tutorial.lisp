@@ -49,6 +49,19 @@
       (:quit () t)
       )))
 
+(defun call-with-resources (surfaces renderer receiver)
+  (with-textures (textures surfaces renderer)
+    (funcall receiver
+             (make-level
+              (make-player
+               (make-animations `(:textures ,textures)))))))
+
+(defmacro with-resources ((resources surfaces renderer) &body body)
+  `(CALL-WITH-RESOURCES
+    ,surfaces ,renderer
+    (LAMBDA (,resources)
+      ,@body)))
+
 (defun main-window (game surfaces)
   (sdl2:with-window (window
                      :w (game-width)

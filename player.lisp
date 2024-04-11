@@ -62,3 +62,13 @@
           ((< l/r 0) (setf (flip? player) t))
           ((> l/r 0) (setf (flip? player) nil))
           (t nil))))
+
+(defun make-player (resources)
+  `(:player
+    ,(make-instance 'player
+                    :x (scale 50)
+                    :y (scale 50)
+                    :state :idle
+                    :animation (get-resource '(:animations :player :idle) resources)
+                    :animations (get-resource '(:animations :player) resources))
+    ,@resources))
