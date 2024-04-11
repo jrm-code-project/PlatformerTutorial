@@ -25,7 +25,7 @@
 
 (defun game-step! (game dticks)
   (when (slot-boundp game 'player)
-    (entity-step! game (player game) (get-state (player game)) dticks))
+    (entity-step! game nil (player game) (get-state (player game)) dticks))
 
   (sb-ext:atomic-incf (car (steps game))))
 
