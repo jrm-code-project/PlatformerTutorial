@@ -5,21 +5,11 @@
 (defun-scaled player-width 16)
 (defun-scaled player-height 26)
 
-(defun-scaled player-attackbox-width 20)
-(defun-scaled player-attackbox-height 6)
-(defun-scaled player-attackbox-x-offset 10)
-(defun-scaled player-attackbox-y-offset 3)
-
-(defclass player (attackbox hitbox health entity)
+(defclass player (hitbox entity)
   ((delta-y :initform 0.0 :accessor delta-y))
   (:default-initargs
    :width (player-width)
-   :height (player-height)
-   :attackbox-width    (player-attackbox-width)
-   :attackbox-height   (player-attackbox-height)
-   :attackbox-x-offset (player-attackbox-x-offset)
-   :attackbox-y-offset (player-attackbox-y-offset)
-   :initial-health 100))
+   :height (player-height)))
 
 (defun l/r-input ()
   (- (if (sdl2:keyboard-state-p :scancode-right)
@@ -36,9 +26,6 @@
      (if (sdl2:keyboard-state-p :scancode-up)
          1
          0)))
-
-(defmethod (setf get-state) :after ((state (eql :attack)) (player player))
-  (start-animation! player :attack1))
 
 (defmethod (setf get-state) :after ((state (eql :falling)) (player player))
   (start-animation! player :falling))
@@ -58,18 +45,6 @@
 (defmethod (setf get-state) :after ((state (eql :running)) (player player))
   (start-animation! player :running))
 
-(defmethod entity-step! (game level (player player) (state (eql :attack)) dticks)
-  (cond ((not (sdl2:keyboard-state-p :scancode-space))
-         (setf (get-state player) :idle))
-        ((= 1 (get-frame (get-animation player)))
-         (dolist (entity (entities level))
-           (when (and (get-state entity)
-                      (can-attack? player entity)
-                      (not (member (get-state entity) '(:hit :dying))))
-             (hit! entity)
-             (return nil))))
-        (t nil)))
-
 (defmethod entity-step! (game level (player player) (state (eql :falling)) dticks)
   (if (entity-supported? level player)
       (setf (delta-y player) 0
@@ -88,18 +63,10 @@
         (unless (zerop dy)
           (move-entity-vertically! level player dy)))))
 
-(defmethod entity-step! (game level (player player) (state (eql :hit)) dticks)
-  (when (animation-finished? (get-animation player))
-    (when (not (plusp (get-health player)))
-      (setf (mode game) (game-over game)))
-    (setf (get-state player) :idle)))
-
 (defmethod entity-step! (game level (player player) (state (eql :idle)) dticks)
   (let ((l/r (l/r-input)))
     (cond ((not (entity-supported? level player))
            (setf (get-state player) :falling))
-          ((sdl2:keyboard-state-p :scancode-space)
-           (setf (get-state player) :attack))
           ((sdl2:keyboard-state-p :scancode-up)
            (setf (get-state player) :jumping))
           ((not (zerop l/r))
@@ -147,8 +114,6 @@
       (move-entity-horizontally! level player dx))
     (cond ((not (entity-supported? level player))
            (setf (get-state player) :falling))
-          ((sdl2:keyboard-state-p :scancode-space)
-           (setf (get-state player) :attack))
           ((sdl2:keyboard-state-p :scancode-up)
            (setf (get-state player) :jumping))
           ((zerop l/r)

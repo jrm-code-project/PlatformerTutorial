@@ -28,22 +28,6 @@
   (:method ((entity entity)) nil))
 
 ;;;;;;;;;;;;;;;;;
-;;; Health Mix-in
-;;;   :initial-health :initarg
-;;;   10 health lost when hit
-;;;   :hit animation started when hit
-
-(defclass health ()
-  ((health :initarg :initial-health :accessor get-health)))
-
-(defgeneric hit! (entity)
-  (:method ((entity health))
-    (decf (get-health entity) 10)
-    (if (< (get-health entity) 0)
-        (setf (get-health entity) 0))
-    (setf (get-state entity) :hit)))
-
-;;;;;;;;;;;;;;;;;
 ;;; Hitbox Mix-in
 ;;;   Gives a width and height to an entity
 ;;;   collision detection with level
@@ -162,54 +146,3 @@
 
 (defun within-five-tiles? (entity-x entity-y)
   (< (abs (- (get-x entity-x) (get-x entity-y))) (* 5 (tile-size))))
-
-;;;;;;;;;;;;;;;;;;;;
-;;; Attackbox Mix-in
-;;;   can-attack? returns true if attacker's attackbox overlaps defenders hitbox
-(defclass attackbox ()
-  ((attackbox-width    :initarg :attackbox-width    :reader get-attackbox-width)
-   (attackbox-height   :initarg :attackbox-height   :reader get-attackbox-height)
-   (attackbox-x-offset :initarg :attackbox-x-offset :reader get-attackbox-x-offset)
-   (attackbox-y-offset :initarg :attackbox-y-offset :reader get-attackbox-y-offset)))
-
-(defun attack-left (entity)
-  (if (flip? entity)
-      (- (get-x entity)
-         (get-attackbox-x-offset entity)
-         (get-attackbox-width entity))
-      (+ (get-x entity)
-         (get-attackbox-x-offset entity))))
-
-(defun attack-right (entity)
-  (if (flip? entity)
-      (- (get-x entity)
-         (get-attackbox-x-offset entity))
-      (+ (get-x entity)
-            (get-attackbox-x-offset entity)
-            (get-attackbox-width entity))))
-
-(defun attack-top (entity)
-  (- (get-y entity)
-     (get-attackbox-y-offset entity)
-     (get-attackbox-height entity)))
-
-(defun attack-bottom (entity)
-  (- (get-y entity)
-     (get-attackbox-y-offset entity)))
-
-(defparameter *render-attackbox* nil)
-
-(defmethod render-entity! :after (renderer resources (entity attackbox))
-  (when *render-attackbox*
-    (sdl2:set-render-draw-color renderer #x00 #x00 #xFF #xFF)
-    (sdl2:with-rects ((r (floor (- (attack-left entity) *world-x-offset*))
-                         (floor (attack-top entity))
-                         (get-attackbox-width entity)
-                         (get-attackbox-height entity)))
-      (sdl2:render-draw-rect renderer r))))
-
-(defun can-attack? (attacker defender)
-  (not (or (< (attack-right attacker) (get-left defender))
-           (> (attack-left attacker) (get-right defender))
-           (< (attack-bottom attacker) (get-top defender))
-           (> (attack-top attacker) (get-bottom defender)))))
