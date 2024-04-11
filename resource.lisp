@@ -34,3 +34,13 @@
     ,@(map 'list (lambda (binding)
                    `(PROGN ,@(cdr binding)))
            bindings)))
+
+(defun call-with-surfaces (receiver)
+  (let-surfaces ((player-sprites-surface (resource-pathname "player_sprites.png")))
+    (funcall receiver
+             `(:player ,player-sprites-surface))))
+
+(defmacro with-surfaces ((surfaces) &body body)
+  `(CALL-WITH-SURFACES
+    (LAMBDA (,surfaces)
+      ,@body)))

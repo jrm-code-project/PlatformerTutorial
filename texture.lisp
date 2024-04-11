@@ -32,3 +32,15 @@
     ,@(map 'list (lambda (binding)
                    `(PROGN ,@(cdr binding)))
            bindings)))
+
+(defun call-with-textures (surfaces renderer receiver)
+  (let-texture (renderer
+                (player-sprites-texture (getf surfaces :player)))
+    (funcall receiver
+             `(:player ,player-sprites-texture))))
+
+(defmacro with-textures ((textures surfaces renderer) &body body)
+  `(CALL-WITH-TEXTURES
+    ,surfaces ,renderer
+    (LAMBDA (,textures)
+      ,@body)))

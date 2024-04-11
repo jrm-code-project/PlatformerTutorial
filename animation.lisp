@@ -5,12 +5,12 @@
 (defgeneric get-frame (animation))
 
 (defclass frame-set ()
-  ((sprite-sheet    :initarg :sprite-sheet     :reader sprite-sheet)
+  ((atlas           :initarg :atlas            :reader atlas)
    (row             :initarg :row              :reader get-row)
    (ticks-per-frame :initarg :ticks-per-frame  :reader ticks-per-frame)))
 
 (defun frame-set-length (frame-set)
-  (row-limit (sprite-sheet frame-set) (get-row frame-set)))
+  (row-limit (atlas frame-set) (get-row frame-set)))
 
 (defclass animation ()
   ((frame-set  :initarg :frame-set        :reader frame-set)
@@ -26,5 +26,31 @@
 
 (defun render-animation! (renderer textures animation x y &key flip?)
   (let ((frame (get-frame animation)))
-    (render-sprite! renderer textures (sprite-sheet (frame-set animation))
+    (render-sprite! renderer textures (atlas (frame-set animation))
                     (get-row (frame-set animation)) frame x y :flip? flip?)))
+
+(defun make-animations (resources)
+  (let* ((player-atlas
+           (make-atlas (get-resource '(:textures :player) resources)
+                       (lambda (textures) (getf textures :player))
+                       #(:idle
+                         :running
+                         :jumping
+                         :falling
+                         :landing
+                         :hit
+                         :attack1
+                         :attack2
+                         :attack3)
+                       #(5 6 3 1 2 4 3 3 3)
+                       :baseline-offset 8))
+         (idle-frame-set
+           (make-instance 'frame-set
+                              :atlas player-atlas
+                              :row :idle
+                              :ticks-per-frame 100)))
+    `(:animations
+      (:player
+       (:idle
+        ,(make-instance 'frame-loop :frame-set idle-frame-set)))
+      ,@resources)))

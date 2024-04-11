@@ -26,3 +26,8 @@
                  (fold-left-n initial (map 'list #'car tails) (map 'list #'cdr tails)))
                 ((every #'null tails) initial)
                 (t (error "Non list in fold-left.")))))))
+
+(defun get-resource (path plist)
+  (cond ((consp path) (get-resource (cdr path) (getf plist (car path))))
+        ((null path) plist)
+        (t (error "Dotted tail in GET-RESOURCE."))))

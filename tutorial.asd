@@ -2,34 +2,36 @@
 
 (defsystem "tutorial"
   :depends-on ("sdl2" "sdl2-image")
-  :components ((:file "animation" :depends-on ("package"
-                                               "parameters"
+  :components ((:file "animation" :depends-on ("atlas"
                                                "macros"
+                                               "package"
+                                               "parameters"
                                                "resource"
                                                "texture"
-                                               "sprites"))
+                                               ))
+               (:file "atlas"  :depends-on ("macros"
+                                            "package"
+                                            "parameters"
+                                            "texture"))
                (:file "game" :depends-on ("animation"
+                                          "macros"
                                           "package"
                                           "parameters"
-                                          "macros"
                                           "resource"
                                           "texture"))
                (:file "macros"   :depends-on ("package"))
                (:file "package")
-               (:file "parameters" :depends-on ("package"
-                                                "macros"))
+               (:file "parameters" :depends-on ("macros"
+                                                "package"))
                (:file "resource" :depends-on ("package"))
-               (:file "sprites"  :depends-on ("package"
-                                              "parameters"
-                                              "macros"
-                                              "texture"))
+               
                (:file "texture"  :depends-on ("package"
                                               "resource"))
                (:file "tutorial" :depends-on ("animation"
                                               "game"
+                                              "macros"
                                               "package"
                                               "parameters"
-                                              "macros"
                                               "resource"
                                               "texture"
                                               "utilities"))

@@ -5,42 +5,25 @@
 (defclass game ()
   ((steps   :initform (cons 0 nil) :accessor steps)))
 
-(defgeneric call-with-surfaces (game receiver)
-  (:method (game receiver)
-    (funcall receiver nil)))
+(defun render-game! (renderer game resources)
+  (declare (ignore game))
+  ;; Clear any old image
+  (sdl2:set-render-draw-color renderer #xff #xff #xff #xff)
+  (sdl2:render-clear renderer)
 
-(defmacro with-surfaces ((surfaces game) &body body)
-  `(CALL-WITH-SURFACES
-    ,game
-    (LAMBDA (,surfaces)
-      ,@body)))
+  (render-animation! renderer (get-resource '(:textures) resources)
+                     (get-resource '(:animations :player :idle) resources)
+                     (scale 50) (scale 50) :flip? t)
+  (sdl2:set-render-draw-color renderer #xff #x00 #x00 #xff)
+  (sdl2:render-draw-line renderer (scale 20) (scale 50) (scale 80) (scale 50))
+  (sdl2:render-draw-line renderer (scale 50) (scale 47) (scale 50) (scale 53))
 
-(defgeneric call-with-resources (game surfaces renderer receiver)
-  (:method (game surfaces renderer receiver)
-    (funcall receiver nil nil nil)))
+  ;; display image
+  (sdl2:render-present renderer))
 
-(defmacro with-resources (((resources) game surfaces renderer) &body body)
-  `(CALL-WITH-RESOURCES
-    ,game ,surfaces ,renderer
-    (LAMBDA (,resources)
-      ,@body)))
-
-(defgeneric render-game! (renderer game resources)
-  (:method :before (renderer game resources)
-    ;; Clear any old image
-    (sdl2:set-render-draw-color renderer #xff #xff #xff #xff)
-    (sdl2:render-clear renderer))
-
-  (:method (renderer game resources)
-    nil)
-
-  (:method :after (renderer game resources)
-    ;; display image
-    (sdl2:render-present renderer)))
-
-(defgeneric game-step! (game dticks)
-  (:method ((game game) dticks)
-    (sb-ext:atomic-incf (car (steps game)))))
+(defun game-step! (game dticks)
+  (declare (ignore dticks))
+  (sb-ext:atomic-incf (car (steps game))))
 
 (defconstant +ticks-per-second+ 1000)
 (defconstant +steps-per-second+ 200)
