@@ -92,13 +92,16 @@
       (:quit () t)
       )))
 
-
 (defun call-with-surfaces (receiver)
   (let-surfaces ((outside-sprites-surface     (resource-pathname "outside_sprites.png"))
                  (player-sprites-surface      (resource-pathname "player_sprites.png")))
     (funcall receiver
              `(:outside             ,outside-sprites-surface
                :player              ,player-sprites-surface))))
+
+(defmacro with-surfaces ((surfaces) &body body)
+  `(CALL-WITH-SURFACES
+    (LAMBDA (,surfaces) ,@body)))
 
 (defun call-with-resources (surfaces renderer receiver)
   (let-texture (renderer
