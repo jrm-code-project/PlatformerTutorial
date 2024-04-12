@@ -18,7 +18,7 @@
 (defgeneric render-entity! (renderer resources entity)
   (:method (renderer resources (entity entity))
     (render-animation! renderer (getf resources :textures) (get-animation entity)
-                       (- (floor (get-x entity)) *world-x-offset*)
+                       (floor (get-x entity))
                        (floor (get-y entity)) :flip? (flip? entity))))
 
 (defun start-animation! (entity animation)
@@ -53,7 +53,7 @@
 (defmethod render-entity! :after (renderer resources (entity hitbox))
   (when *render-hitbox*
     (sdl2:set-render-draw-color renderer #xff #x00 #x00 #xFF)
-    (sdl2:with-rects ((r (floor (- (get-left entity) *world-x-offset*))
+    (sdl2:with-rects ((r (floor (get-left entity))
                          (floor (get-top entity))
                          (get-width entity)
                          (get-height entity)))

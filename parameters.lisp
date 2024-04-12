@@ -11,6 +11,3 @@
 (defun-scaled tile-size 32)
 (defun game-width () (* (tile-size) (width-in-tiles)))
 (defun game-height () (* (tile-size) (height-in-tiles)))
-
-(defvar *world-x-offset* 0
-  "How far the world has scrolled to the right in pixels.")
