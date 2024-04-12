@@ -21,13 +21,6 @@
                                           "parameters"
                                           "resource"
                                           "texture"))
-               (:file "level"    :depends-on ("game"
-                                              "macros"
-                                              "package"
-                                              "parameters"
-                                              "resource"
-                                              "texture"
-                                              "utilities"))
                (:file "macros"   :depends-on ("package"))
                (:file "package")
                (:file "parameters" :depends-on ("macros"
@@ -41,7 +34,6 @@
                                               "resource"))
                (:file "tutorial" :depends-on ("animation"
                                               "game"
-                                              "level"
                                               "macros"
                                               "package"
                                               "parameters"

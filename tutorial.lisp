@@ -92,28 +92,15 @@
       (:quit () t)
       )))
 
-(defun call-with-surfaces (receiver)
-  (let-surfaces ((outside-sprites-surface     (resource-pathname "outside_sprites.png"))
-                 (player-sprites-surface      (resource-pathname "player_sprites.png")))
-    (funcall receiver
-             `(:outside             ,outside-sprites-surface
-               :player              ,player-sprites-surface))))
-
-(defmacro with-surfaces ((surfaces) &body body)
-  `(CALL-WITH-SURFACES
-    (LAMBDA (,surfaces) ,@body)))
-
 (defun call-with-resources (surfaces renderer receiver)
   (let-texture (renderer
-                (outside-sprites-texture (getf surfaces :outside))
                 (player-sprites-texture  (getf surfaces :player)))
     (fold-left (lambda (resources constructor)
                  (funcall constructor resources))
                `(:textures
-                 (:outside             ,outside-sprites-texture
-                  :player              ,player-sprites-texture))
+                 (:player              ,player-sprites-texture))
                (list #'make-animations
-                     #'make-level
+                     #'make-player
                      receiver))))
 
 (defmacro with-resources ((resources surfaces renderer) &body body)
@@ -134,15 +121,10 @@
           (main-event-loop game window renderer resources))))))
 
 (defun run (game)
-  (sdl2-ttf:init)
-  (with-sdl2-images (:png)
-    (with-surfaces (surfaces)
-      (sdl2:with-init (:video)
-        (main-window game surfaces)))))
-
-(defclass platformer (game)
-  ())
+  (with-surfaces (surfaces)
+    (sdl2:with-init (:video)
+      (main-window game surfaces))))
 
 (defun main ()
-  (let ((game (make-instance 'platformer)))
+  (let ((game (make-instance 'game)))
     (run game)))
