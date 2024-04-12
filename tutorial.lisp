@@ -176,7 +176,6 @@
                      #'make-level
                      #'make-menu
                      #'make-pause-menu
-                     #'make-game-over
                      receiver))))
 
 (defun main ()

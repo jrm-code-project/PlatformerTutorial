@@ -13,21 +13,11 @@
    :width (crabby-width)
    :height (crabby-height)))
 
-(defmethod (setf get-state) :after ((state (eql :dying)) (crabby crabby))
-  (start-animation! crabby :dying))
-
-(defmethod (setf get-state) :after ((state (eql :hit)) (crabby crabby))
-  (start-animation! crabby :hit))
-
 (defmethod (setf get-state) :after ((state (eql :idle)) (crabby crabby))
   (start-animation! crabby :idle))
 
 (defmethod (setf get-state) :after ((state (eql :running)) (crabby crabby))
   (start-animation! crabby :running))
-
-(defmethod entity-step! (game level (crabby crabby) (state (eql :dying)) dticks)
-  (when (animation-finished? (get-animation crabby))
-    (setf (get-state crabby) nil)))
 
 (defmethod entity-step! (game level (crabby crabby) (state (eql :falling)) dticks)
   (if (entity-supported? level crabby)
