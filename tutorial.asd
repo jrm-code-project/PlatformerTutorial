@@ -23,16 +23,12 @@
                                           "texture"))
                (:file "level"    :depends-on ("game"
                                               "macros"
-                                              "mode"
                                               "package"
                                               "parameters"
                                               "resource"
                                               "texture"
                                               "utilities"))
                (:file "macros"   :depends-on ("package"))
-               (:file "mode"      :depends-on ("entity"
-                                               "macros"
-                                               "package"))
                (:file "package")
                (:file "parameters" :depends-on ("macros"
                                                 "package"))

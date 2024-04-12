@@ -3,8 +3,7 @@
 (in-package "TUTORIAL")
 
 (defclass game ()
-  ((mode        :accessor mode)
-   (level       :accessor level)
+  ((level       :accessor level)
    (first-level :accessor first-level)
    (steps   :initform (cons 0 nil) :accessor steps)))
 
@@ -30,7 +29,6 @@
 
 (defun initialize-game! (game resources)
   (setf (first-level game) (getf resources :level)
-        (mode game)   (getf resources :level)
         (level game)  (getf resources :level)))
 
 (defun render-game! (renderer game resources)
@@ -38,13 +36,13 @@
   (sdl2:set-render-draw-color renderer #xff #xff #xff #xff)
   (sdl2:render-clear renderer)
 
-  (render-mode! renderer resources game (mode game))
+  (render-level! renderer resources (level game))
 
   ;; display image
   (sdl2:render-present renderer))
 
 (defun game-step! (game dticks)
-  (mode-step! game (mode game) dticks)
+  (entity-step! game (level game) (player (level game)) (get-state (player (level game))) dticks)
   (sb-ext:atomic-incf (car (steps game))))
 
 (defconstant +ticks-per-second+ 1000)

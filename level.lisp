@@ -2,7 +2,7 @@
 
 (in-package "TUTORIAL")
 
-(defclass level (mode)
+(defclass level ()
   ((player   :initarg :player   :accessor player)
    (tiles    :initarg :tiles    :accessor tiles)))
 
@@ -37,9 +37,9 @@
             (when *render-tile-outline*
               (sdl2:render-draw-rect renderer dst))))))))
 
-(defmethod render-mode! (renderer resources game (level level))
+(defun render-level! (renderer resources level)
   (render-tiles! renderer (get-resource '(:textures :outside) resources) (tiles level))
-  (call-next-method))
+  (render-entity! renderer resources (player level)))
 
 (defun blank-tile? (level tile-x tile-y)
   (and (>= tile-x 0)
@@ -111,10 +111,8 @@
                                   :state :idle
                                   :animation (funcall (get-resource '(:animations :player :idle) resources))
                                   :animations (get-resource '(:animations :player) resources)))
-           (entities '())
            (level-tiles (car (read-level-data))))
        (make-instance 'level
                       :tiles level-tiles
-                      :player player
-                      :entities (cons player entities)))
+                      :player player))
     ,@resources))
