@@ -2,50 +2,10 @@
 
 (in-package "TUTORIAL")
 
-(defun-scaled big-cloud-y-offset 204)
-(defun-scaled small-cloud-minimum-y 80)
-(defun-scaled small-cloud-maximum-y 175)
-
 (defclass level (mode)
   ((player   :initarg :player   :accessor player)
    (tiles    :initarg :tiles    :accessor tiles)
-   (x-offset :initform 0        :accessor x-offset)
-   (cloud-heights :initform
-                  (do ((l '() (cons (+ (small-cloud-minimum-y)
-                                       (random (- (small-cloud-maximum-y)
-                                                  (small-cloud-minimum-y))))
-                                    l))
-                       (i 0 (1+ i)))
-                      ((>= i 10) l))
-                  :reader get-cloud-heights)))
-
-(defun render-big-clouds! (renderer big-cloud-texture)
-  (dotimes (i 3)
-    (sdl2:with-rects ((src 0 0 (sdl2:texture-width big-cloud-texture) (sdl2:texture-height big-cloud-texture))
-                      (dst (- (* i (scale (sdl2:texture-width big-cloud-texture)))
-                              (floor (* .3 *world-x-offset*)))
-                           (big-cloud-y-offset)
-                           (scale (sdl2:texture-width big-cloud-texture))
-                           (scale (sdl2:texture-height big-cloud-texture))))
-      (sdl2:render-copy renderer big-cloud-texture :source-rect src :dest-rect dst))))
-
-(defun render-small-clouds! (renderer small-cloud-texture small-cloud-heights)
-  (do ((h small-cloud-heights (cdr h))
-       (i 0 (+ i 1)))
-      ((null h))
-    (sdl2:with-rects ((src 0 0 (sdl2:texture-width small-cloud-texture) (sdl2:texture-height small-cloud-texture))
-                      (dst (floor (- (* i 4 (scale (sdl2:texture-width small-cloud-texture))) (* *world-x-offset* .7)))
-                           (car h)
-                           (scale (sdl2:texture-width small-cloud-texture))
-                           (scale (sdl2:texture-height small-cloud-texture))))
-      (sdl2:render-copy renderer small-cloud-texture :source-rect src :dest-rect dst))))
-
-(defun render-level-background! (renderer level-background-texture)
-  (sdl2:with-rects ((src 0 0
-                         (sdl2:texture-width level-background-texture)
-                         (sdl2:texture-height level-background-texture))
-                    (dst 0 0 (game-width) (game-height)))
-    (sdl2:render-copy renderer level-background-texture :source-rect src :dest-rect dst)))
+   (x-offset :initform 0        :accessor x-offset)))
 
 (defun level-tiles-width (level-tiles)
   (array-dimension level-tiles 0))
@@ -96,9 +56,6 @@
 (defmethod render-mode! (renderer resources game (level level))
   (adjust-x-offset! level)
   (let ((*world-x-offset* (x-offset level)))
-    (render-level-background! renderer (get-resource '(:textures :playing-background) resources))
-    (render-big-clouds! renderer (get-resource '(:textures :big-clouds) resources))
-    (render-small-clouds! renderer (get-resource '(:textures :small-clouds) resources) (get-cloud-heights level))
     (render-tiles! renderer (get-resource '(:textures :outside) resources) (tiles level))
     (call-next-method)))
 
