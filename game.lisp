@@ -7,7 +7,6 @@
    (level       :accessor level)
    (first-level :accessor first-level)
    (menu        :accessor menu)
-   (paused-menu :accessor paused-menu)
    (steps   :initform (cons 0 nil) :accessor steps)))
 
 (defgeneric call-with-surfaces (game receiver)
@@ -32,7 +31,6 @@
 
 (defun initialize-game! (game resources)
   (setf (first-level game) (getf resources :level)
-        (paused-menu game) (getf resources :pause-menu)
         (mode game)   (getf resources :menu)
         (level game)  (getf resources :level)
         (menu game)   (getf resources :menu)))

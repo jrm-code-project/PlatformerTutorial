@@ -117,21 +117,13 @@
                  (menu-surface                (resource-pathname "menu_background.png"))
                  (menu-background-surface     (resource-pathname "background_menu.png"))
                  (outside-sprites-surface     (resource-pathname "outside_sprites.png"))
-                 (pause-menu-surface          (resource-pathname "pause_menu.png"))
-                 (player-sprites-surface      (resource-pathname "player_sprites.png"))
-                 (sound-button-atlas-surface  (resource-pathname "sound_button.png"))
-                 (urm-button-atlas-surface    (resource-pathname "urm_buttons.png"))
-                 (volume-button-atlas-surface (resource-pathname "volume_buttons.png")))
+                 (player-sprites-surface      (resource-pathname "player_sprites.png")))
     (funcall receiver
              `(:button-atlas        ,button-atlas-surface
                :menu                ,menu-surface
                :menu-background     ,menu-background-surface
                :outside             ,outside-sprites-surface
-               :pause-menu          ,pause-menu-surface
-               :player              ,player-sprites-surface
-               :sound-button-atlas  ,sound-button-atlas-surface
-               :urm-button-atlas    ,urm-button-atlas-surface
-               :volume-button-atlas ,volume-button-atlas-surface))))
+               :player              ,player-sprites-surface))))
 
 (defmethod call-with-resources ((game platformer) surfaces renderer receiver)
   (let-texture (renderer
@@ -139,11 +131,7 @@
                 (menu-texture            (getf surfaces :menu))
                 (menu-background-texture (getf surfaces :menu-background))
                 (outside-sprites-texture (getf surfaces :outside))
-                (pause-menu-texture      (getf surfaces :pause-menu))
-                (player-sprites-texture  (getf surfaces :player))
-                (sound-atlas-texture     (getf surfaces :sound-button-atlas))
-                (urm-atlas-texture       (getf surfaces :urm-button-atlas))
-                (volume-atlas-texture    (getf surfaces :volume-button-atlas)))
+                (player-sprites-texture  (getf surfaces :player)))
     (fold-left (lambda (resources constructor)
                  (funcall constructor resources))
                `(:textures
@@ -151,15 +139,10 @@
                   :menu                ,menu-texture
                   :menu-background     ,menu-background-texture
                   :outside             ,outside-sprites-texture
-                  :pause-menu          ,pause-menu-texture
-                  :player              ,player-sprites-texture
-                  :sound-button-atlas  ,sound-atlas-texture
-                  :urm-button-atlas    ,urm-atlas-texture
-                  :volume-button-atlas ,volume-atlas-texture))
+                  :player              ,player-sprites-texture))
                (list #'make-animations
                      #'make-level
                      #'make-menu
-                     #'make-pause-menu
                      receiver))))
 
 (defun main ()

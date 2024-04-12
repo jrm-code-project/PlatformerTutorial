@@ -134,43 +134,5 @@
           :landing
           ,(one-shot-animation player-atlas :landing)
           :running
-          ,(frame-loop-animation player-atlas :running)))
-     :sound-buttons
-     ,(let ((button-atlas
-              (make-atlas (get-resource '(:textures :sound-button-atlas) resources)
-                          (lambda (textures) (getf textures :sound-button-atlas))
-                          #(:on
-                            :off)
-                          #(3 3))))
-        `(:on
-          ,(button-animation button-atlas :on)
-          :off
-          ,(button-animation button-atlas :off)))
-
-     :urm-buttons
-     ,(let ((button-atlas
-              (make-atlas (get-resource '(:textures :urm-button-atlas) resources)
-                          (lambda (textures) (getf textures :urm-button-atlas))
-                          #(:resume
-                            :restart
-                            :menu)
-                          #(3 3 3))))
-        `(:menu
-          ,(button-animation button-atlas :menu)
-          :restart
-          ,(button-animation button-atlas :restart)
-          :resume
-          ,(button-animation button-atlas :resume)))
-     :volume-button
-     ,(let ((button-atlas
-              (make-instance 'atlas
-                             :selector (lambda (textures) (getf textures :volume-button-atlas))
-                             :frame-width (base-volume-slider-width)
-                             :frame-height (sdl2:texture-height
-                                            (get-resource '(:textures :volume-button-atlas) resources))
-                             :baseline-offset 0
-                             :rows #(:volume)
-                             :row-limits #(3))))
-        `(:slider
-          ,(button-animation button-atlas :volume))))
+          ,(frame-loop-animation player-atlas :running))))
     ,@resources))

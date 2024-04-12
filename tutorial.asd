@@ -49,12 +49,6 @@
                (:file "package")
                (:file "parameters" :depends-on ("macros"
                                                 "package"))
-               (:file "pause-menu" :depends-on ("animation"
-                                                "entity"
-                                                "level"
-                                                "macros"
-                                                "mode"
-                                                "package"))
                (:file "player"   :depends-on ("entity"
                                               "macros"
                                               "package"
