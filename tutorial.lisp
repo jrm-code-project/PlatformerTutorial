@@ -77,6 +77,7 @@
                        (sdl2:push-quit-event))
                       ;; suppress output for these known keys
                       ((member (sdl2:scancode keysym) '(:scancode-backspace
+                                                        :scancode-down
                                                         :scancode-escape
                                                         :scancode-left
                                                         :scancode-return

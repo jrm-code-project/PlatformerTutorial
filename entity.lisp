@@ -2,8 +2,6 @@
 
 (in-package "TUTORIAL")
 
-(defun gravity () (scalef .001))
-
 (defclass entity ()
   ((state :initarg :state :accessor get-state)
    (x :initarg :x :accessor get-x)
@@ -59,34 +57,6 @@
                          (get-height entity)))
       (sdl2:render-draw-rect renderer r))))
 
-(defun entity-under-point? (entity x y)
-  (and (>= x (get-left entity))
-       (<= x (get-right entity))
-       (>= y (get-top entity))
-       (<= y (get-bottom entity))))
-
-(defun entity-supported? (level entity)
-  (or (point-supported? level (get-left entity) (get-bottom entity))
-      (point-supported? level (get-right entity) (get-bottom entity))))
-
-(defun entity-covered? (level entity)
-  (or (point-covered? level (get-left entity) (get-top entity))
-      (point-covered? level (get-right entity) (get-top entity))))
-
-(defun against-left-wall? (level entity)
-  (or (point-against-left-wall? level (get-left entity) (get-top entity))
-      (point-against-left-wall? level (get-left entity) (get-bottom entity))))
-
-(defun against-right-wall? (level entity)
-  (or (point-against-right-wall? level (get-right entity) (get-top entity))
-      (point-against-right-wall? level (get-right entity) (get-bottom entity))))
-
-(defun unsupported-on-left? (level entity)
-  (not (point-supported? level (get-left entity) (get-bottom entity))))
-
-(defun unsupported-on-right? (level entity)
-  (not (point-supported? level (get-right entity) (get-bottom entity))))
-
 (defun move-entity-left! (level entity dx)
   (let ((x1 (move-point-left level
                               (get-left entity)
@@ -141,8 +111,3 @@
         ((> dy 0) (move-entity-down! level entity dy))
         (t nil)))
 
-(defun same-level? (entity-x entity-y)
-  (< (abs (- (get-y entity-x) (get-y entity-y))) 5))
-
-(defun within-five-tiles? (entity-x entity-y)
-  (< (abs (- (get-x entity-x) (get-x entity-y))) (* 5 (tile-size))))

@@ -51,22 +51,6 @@
 (defun coord->tile (x y)
   (values (floor x (tile-size)) (floor y (tile-size))))
 
-(defun point-supported? (level x y)
-  (multiple-value-bind (tile-x tile-y) (coord->tile x (+ y 1))
-    (not (blank-tile? level tile-x tile-y))))
-
-(defun point-against-right-wall? (level x y)
-  (multiple-value-bind (tile-x tile-y) (coord->tile (+ x 1) y)
-    (not (blank-tile? level tile-x tile-y))))
-
-(defun point-against-left-wall? (level x y)
-  (multiple-value-bind (tile-x tile-y) (coord->tile (- x 1) y)
-    (not (blank-tile? level tile-x tile-y))))
-
-(defun point-covered? (level x y)
-  (multiple-value-bind (tile-x tile-y) (coord->tile x (- y 1))
-    (not (blank-tile? level tile-x tile-y))))
-
 (defun tile-left (tile-x)
   (* tile-x (tile-size)))
 
