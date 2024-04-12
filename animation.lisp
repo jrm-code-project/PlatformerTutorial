@@ -34,23 +34,6 @@
     (mod absolute-frame (frame-set-length (frame-set frame-loop)))))
 
 ;;;;;;;;;;;
-;;; One-shot
-;;;   Runs once, then freezes
-
-(defclass one-shot (animation)
-  ())
-
-(defmethod get-frame ((one-shot one-shot))
-  (let* ((total-ticks (- (sdl2:get-ticks) (start-tick one-shot)))
-         (absolute-frame  (floor total-ticks (ticks-per-frame (frame-set one-shot)))))
-    (min absolute-frame (- (frame-set-length (frame-set one-shot)) 1))))
-
-(defun animation-finished? (one-shot)
-  (let* ((total-ticks (- (sdl2:get-ticks) (start-tick one-shot)))
-         (absolute-frame  (floor total-ticks (ticks-per-frame (frame-set one-shot)))))
-    (>= absolute-frame (frame-set-length (frame-set one-shot)))))
-
-;;;;;;;;;;;
 ;;; Load animations for the game
 
 (defun frame-loop-animation (atlas row)

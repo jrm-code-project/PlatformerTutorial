@@ -41,52 +41,6 @@
   (render-tiles! renderer (get-resource '(:textures :outside) resources) (tiles level))
   (render-entity! renderer resources (player level)))
 
-(defun blank-tile? (level tile-x tile-y)
-  (and (>= tile-x 0)
-       (< tile-x (level-tiles-width (tiles level)))
-       (>= tile-y 0)
-       (< tile-y (level-tiles-height (tiles level)))
-       (= 11 (aref (tiles level) tile-x tile-y 0))))
-
-(defun coord->tile (x y)
-  (values (floor x (tile-size)) (floor y (tile-size))))
-
-(defun tile-left (tile-x)
-  (* tile-x (tile-size)))
-
-(defun tile-right (tile-x)
-  (- (* (+ tile-x 1) (tile-size)) 1))
-
-(defun tile-top (tile-y)
-  (* tile-y (tile-size)))
-
-(defun tile-bottom (tile-y)
-  (- (* (+ tile-y 1) (tile-size)) 1))
-
-(defun move-point-left (level x y dx)
-  (multiple-value-bind (tile-x tile-y) (coord->tile (+ x dx) y)
-    (if (blank-tile? level tile-x tile-y)
-        (+ x dx)
-        (tile-left (+ tile-x 1)))))
-
-(defun move-point-right (level x y dx)
-  (multiple-value-bind (tile-x tile-y) (coord->tile (+ x dx) y)
-    (if (blank-tile? level tile-x tile-y)
-        (+ x dx)
-        (tile-right (- tile-x 1)))))
-
-(defun move-point-down (level x y dy)
-  (multiple-value-bind (tile-x tile-y) (coord->tile x (+ y dy))
-    (if (blank-tile? level tile-x tile-y)
-        (+ y dy)
-        (tile-bottom (- tile-y 1)))))
-
-(defun move-point-up (level x y dy)
-  (multiple-value-bind (tile-x tile-y) (coord->tile x (+ y dy))
-    (if (blank-tile? level tile-x tile-y)
-        (+ y dy)
-        (tile-top (+ tile-y 1)))))
-
 (defun make-level (resources)
   `(:level
     ,(let ((player (make-instance 'player
