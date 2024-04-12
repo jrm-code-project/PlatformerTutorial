@@ -179,13 +179,7 @@
                                   :state :idle
                                   :animation (funcall (get-resource '(:animations :player :idle) resources))
                                   :animations (get-resource '(:animations :player) resources)))
-           (entities (list
-                      (make-instance 'crabby
-                                     :x (scale 200)
-                                     :y (scale 150)
-                                     :state :idle
-                                     :animation (funcall (get-resource '(:animations :crabby :idle) resources))
-                                     :animations (get-resource '(:animations :crabby) resources))))
+           (entities '())
            (level-tiles (car (read-level-data))))
        (make-instance 'level
                       :tiles level-tiles

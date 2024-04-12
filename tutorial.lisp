@@ -115,7 +115,6 @@
 (defmethod call-with-surfaces ((game platformer) receiver)
   (let-surfaces ((big-clouds-surface          (resource-pathname "big_clouds.png"))
                  (button-atlas-surface        (resource-pathname "button_atlas.png"))
-                 (crabby-atlas-surface        (resource-pathname "crabby_sprite.png"))
                  (menu-surface                (resource-pathname "menu_background.png"))
                  (menu-background-surface     (resource-pathname "background_menu.png"))
                  (outside-sprites-surface     (resource-pathname "outside_sprites.png"))
@@ -129,7 +128,6 @@
     (funcall receiver
              `(:big-clouds          ,big-clouds-surface
                :button-atlas        ,button-atlas-surface
-               :crabby-atlas        ,crabby-atlas-surface
                :menu                ,menu-surface
                :menu-background     ,menu-background-surface
                :outside             ,outside-sprites-surface
@@ -145,7 +143,6 @@
   (let-texture (renderer
                 (big-clouds-texture      (getf surfaces :big-clouds))
                 (button-atlas-texture    (getf surfaces :button-atlas))
-                (crabby-atlas-texture    (getf surfaces :crabby-atlas))
                 (menu-texture            (getf surfaces :menu))
                 (menu-background-texture (getf surfaces :menu-background))
                 (outside-sprites-texture (getf surfaces :outside))
@@ -161,7 +158,6 @@
                `(:textures
                  (:big-clouds          ,big-clouds-texture
                   :button-atlas        ,button-atlas-texture
-                  :crabby              ,crabby-atlas-texture
                   :menu                ,menu-texture
                   :menu-background     ,menu-background-texture
                   :outside             ,outside-sprites-texture

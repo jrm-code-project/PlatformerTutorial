@@ -17,15 +17,6 @@
                                               "macros"
                                               "package"
                                               "parameters"))
-               (:file "crabby"   :depends-on ("enemy"
-                                              "entity"
-                                              "macros"
-                                              "package"
-                                              "parameters"))
-               (:file "enemy"    :depends-on ("entity"
-                                              "macros"
-                                              "package"
-                                              "parameters"))
                (:file "entity"   :depends-on ("macros"
                                               "package"
                                               "parameters"))

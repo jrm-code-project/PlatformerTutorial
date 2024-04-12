@@ -106,27 +106,6 @@
           ,(button-animation button-atlas :options)
           :quit
           ,(button-animation button-atlas :quit)))
-     :crabby
-     ,(let ((crabby-atlas
-              (make-atlas (get-resource '(:textures :crabby) resources)
-                          (lambda (textures) (getf textures :crabby))
-                          #(:idle
-                            :running
-                            :attack
-                            :hit
-                            :dying)
-                          #(9 6 7 4 5)
-                          :baseline-offset 4)))
-        `(:attack
-          ,(frame-loop-animation crabby-atlas :attack)
-          :dying
-          ,(frame-loop-animation crabby-atlas :dying)
-          :hit
-          ,(frame-loop-animation crabby-atlas :hit)                                            
-          :idle
-          ,(frame-loop-animation crabby-atlas :idle)                                            
-          :running
-          ,(frame-loop-animation crabby-atlas :running)))
      :player
      ,(let ((player-atlas
               (make-atlas (get-resource '(:textures :player) resources)
