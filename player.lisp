@@ -33,9 +33,6 @@
 (defmethod (setf get-state) :after ((state (eql :idle)) (player player))
   (start-animation! player :idle))
 
-(defmethod (setf get-state) :after ((state (eql :hit)) (player player))
-  (start-animation! player :hit))
-
 (defmethod (setf get-state) :after ((state (eql :jumping)) (player player))
   (start-animation! player :jumping))
 

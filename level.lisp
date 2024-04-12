@@ -173,28 +173,20 @@
 
 (defun make-level (resources)
   `(:level
-    ,(let ((player nil)
-           (entities nil)
+    ,(let ((player (make-instance 'player
+                                  :x (scale 100)
+                                  :y (scale 150)
+                                  :state :idle
+                                  :animation (funcall (get-resource '(:animations :player :idle) resources))
+                                  :animations (get-resource '(:animations :player) resources)))
+           (entities (list
+                      (make-instance 'crabby
+                                     :x (scale 200)
+                                     :y (scale 150)
+                                     :state :idle
+                                     :animation (funcall (get-resource '(:animations :crabby :idle) resources))
+                                     :animations (get-resource '(:animations :crabby) resources))))
            (level-tiles (car (read-level-data))))
-       (dotimes (i (level-tiles-width level-tiles))
-         (dotimes (j (level-tiles-height level-tiles))
-           (cond ((= 100 (aref level-tiles i j 1))
-                  (setq player
-                        (make-instance 'player
-                                       :x (+ (/ (tile-size) 2) (* i (tile-size)))
-                                       :y (- (* (+ j 1) (tile-size)) 1)
-                                       :state :idle
-                                       :animation (funcall (get-resource '(:animations :player :idle) resources))
-                                       :animations (get-resource '(:animations :player) resources))))
-                 ((zerop (aref level-tiles i j 1))
-                  (push (make-instance 'crabby
-                                       :x (+ (/ (tile-size) 2) (* i (tile-size)))
-                                       :y (- (* (+ j 1) (tile-size)) 1)
-                                       :state :idle
-                                       :animation (funcall (get-resource '(:animations :crabby :idle) resources))
-                                       :animations (get-resource '(:animations :crabby) resources))
-                        entities))
-                 (t nil))))
        (make-instance 'level
                       :tiles level-tiles
                       :player player
