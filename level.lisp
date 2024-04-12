@@ -41,11 +41,6 @@
   (render-tiles! renderer (get-resource '(:textures :outside) resources) (tiles level))
   (call-next-method))
 
-(defmethod mode-step! (game (level level) dticks)
-  (cond ((sdl2:keyboard-state-p :scancode-backspace)
-         (setf (mode game) (menu game)))
-        (t (call-next-method))))
-
 (defun blank-tile? (level tile-x tile-y)
   (and (>= tile-x 0)
        (< tile-x (level-tiles-width (tiles level)))

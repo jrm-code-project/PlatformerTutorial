@@ -6,7 +6,6 @@
   ((mode        :accessor mode)
    (level       :accessor level)
    (first-level :accessor first-level)
-   (menu        :accessor menu)
    (steps   :initform (cons 0 nil) :accessor steps)))
 
 (defgeneric call-with-surfaces (game receiver)
@@ -31,9 +30,8 @@
 
 (defun initialize-game! (game resources)
   (setf (first-level game) (getf resources :level)
-        (mode game)   (getf resources :menu)
-        (level game)  (getf resources :level)
-        (menu game)   (getf resources :menu)))
+        (mode game)   (getf resources :level)
+        (level game)  (getf resources :level)))
 
 (defun render-game! (renderer game resources)
   ;; Clear any old image

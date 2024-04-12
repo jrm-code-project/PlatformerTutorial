@@ -12,11 +12,6 @@
                                               "package"
                                               "parameters"
                                               "texture"))
-               (:file "button"   :depends-on ("animation"
-                                              "entity"
-                                              "macros"
-                                              "package"
-                                              "parameters"))
                (:file "entity"   :depends-on ("macros"
                                               "package"
                                               "parameters"))
@@ -35,14 +30,6 @@
                                               "texture"
                                               "utilities"))
                (:file "macros"   :depends-on ("package"))
-               (:file "menu"     :depends-on ("game"
-                                              "macros"
-                                              "mode"
-                                              "package"
-                                              "parameters"
-                                              "resource"
-                                              "texture"
-                                              "utilities"))
                (:file "mode"      :depends-on ("entity"
                                                "macros"
                                                "package"))

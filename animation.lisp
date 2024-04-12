@@ -50,29 +50,8 @@
          (absolute-frame  (floor total-ticks (ticks-per-frame (frame-set one-shot)))))
     (>= absolute-frame (frame-set-length (frame-set one-shot)))))
 
-;;;;;;;;;;;;
-;;; Slides
-;;;   Select the current-slide to show. 
-
-(defclass slides (animation)
-  ((current-slide :initarg :current-slide :accessor current-slide)
-   (slides :initarg :slides :reader slides)))
-
-(defmethod get-frame ((slides slides))
-  (position (current-slide slides) (slides slides)))
-
 ;;;;;;;;;;;
 ;;; Load animations for the game
-
-(defun button-animation (atlas row)
-  (let ((frame-set (make-instance 'frame-set
-                                  :atlas atlas
-                                  :row row)))
-    (lambda ()
-      (make-instance 'slides
-                      :frame-set frame-set
-                      :current-slide :idle
-                      :slides #(:idle :hover :pressed)))))
 
 (defun frame-loop-animation (atlas row)
   (let ((frame-set (make-instance 'frame-set
@@ -92,21 +71,7 @@
 
 (defun make-animations (resources)
   `(:animations
-    (:button
-     ,(let ((button-atlas
-              (make-atlas (get-resource '(:textures :button-atlas) resources)
-                          (lambda (textures) (getf textures :button-atlas))
-                          #(:play
-                            :options
-                            :quit)
-                          #(3 3 3))))
-        `(:play
-          ,(button-animation button-atlas :play)
-          :options
-          ,(button-animation button-atlas :options)
-          :quit
-          ,(button-animation button-atlas :quit)))
-     :player
+    (:player
      ,(let ((player-atlas
               (make-atlas (get-resource '(:textures :player) resources)
                           (lambda (textures) (getf textures :player))
