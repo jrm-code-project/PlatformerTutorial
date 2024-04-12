@@ -51,8 +51,7 @@
                            (volume-slider-height)))
       (sdl2:render-copy renderer slider-background :source-rect src :dest-rect dst)))
 
-  (let ((*world-x-offset* 0))
-    (call-next-method)))
+  (call-next-method))
 
 (defun make-pause-menu (resources)
   `(:pause-menu
