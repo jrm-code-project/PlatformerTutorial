@@ -1,14 +1,13 @@
 ;;; -*- Lisp -*-
 
 (defsystem "tutorial"
-  :depends-on ("png-read" "sdl2" "sdl2-image")
+  :depends-on ("png-read" "sdl2" "sdl2-image" "sdl2-ttf")
   :components ((:file "animation" :depends-on ("atlas"
                                                "macros"
                                                "package"
                                                "parameters"
                                                "resource"
-                                               "texture"
-                                               ))
+                                               "texture"))
                (:file "atlas"    :depends-on ("macros"
                                               "package"
                                               "parameters"
@@ -17,13 +16,13 @@
                                               "package"
                                               "parameters"))
                (:file "game" :depends-on ("animation"
-                                          "level"
                                           "macros"
                                           "package"
                                           "parameters"
                                           "resource"
                                           "texture"))
-               (:file "level"    :depends-on ("macros"
+               (:file "level"    :depends-on ("game"
+                                              "macros"
                                               "package"
                                               "parameters"
                                               "resource"

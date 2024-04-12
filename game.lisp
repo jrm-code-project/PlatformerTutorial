@@ -3,14 +3,13 @@
 (in-package "TUTORIAL")
 
 (defclass game ()
-  ((player  :accessor player)
-   (level   :accessor level)
-
+  ((level       :accessor level)
+   (first-level :accessor first-level)
    (steps   :initform (cons 0 nil) :accessor steps)))
 
 (defun initialize-game! (game resources)
-  (setf (level game)  (getf resources :level)
-        (player game) (getf resources :player)))
+  (setf (first-level game) (getf resources :level)
+        (level game)  (getf resources :level)))
 
 (defun render-game! (renderer game resources)
   ;; Clear any old image
@@ -18,15 +17,12 @@
   (sdl2:render-clear renderer)
 
   (render-level! renderer resources (level game))
-  (render-entity! renderer resources (player game))
 
   ;; display image
   (sdl2:render-present renderer))
 
 (defun game-step! (game dticks)
-  (when (slot-boundp game 'player)
-    (entity-step! game nil (player game) (get-state (player game)) dticks))
-
+  (entity-step! game (level game) (player (level game)) (get-state (player (level game))) dticks)
   (sb-ext:atomic-incf (car (steps game))))
 
 (defconstant +ticks-per-second+ 1000)

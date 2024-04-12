@@ -31,4 +31,3 @@
   (cond ((consp key) (get-resource (cdr key) (getf resources (car key))))
         ((null key) resources)
         (t (error "Dotted list."))))
-
