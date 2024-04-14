@@ -123,7 +123,7 @@
                      :h (game-height)
                      :flags '(:shown))
     (sdl2:with-renderer (renderer window :index -1 :flags '(:accelerated))
-      (with-resources ((resources) game surfaces renderer)
+      (with-resources (resources surfaces renderer)
         (initialize-game! game resources)
         (with-game-loop (game)
           (main-event-loop game window renderer resources))))))
@@ -134,7 +134,6 @@
     (with-surfaces (surfaces)
       (sdl2:with-init (:video)
         (main-window game surfaces)))))
-
 
 (defun main ()
   (let ((game (make-instance 'game)))
