@@ -1,7 +1,7 @@
 ;;; -*- Lisp -*-
 
 (defsystem "tutorial"
-  :depends-on ("png-read" "sdl2" "sdl2-image" "sdl2-ttf")
+  :depends-on ("png-read" "sdl2" "sdl2-image")
   :components ((:file "animation" :depends-on ("atlas"
                                                "macros"
                                                "package"
