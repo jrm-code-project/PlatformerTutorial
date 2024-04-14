@@ -33,6 +33,9 @@
                (:file "mode"      :depends-on ("entity"
                                                "macros"
                                                "package"))
+               (:file "menu"     :depends-on ("macros"
+                                              "mode"
+                                              "package"))
                (:file "package")
                (:file "parameters" :depends-on ("macros"
                                                 "package"))
