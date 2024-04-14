@@ -96,15 +96,11 @@
           (main-event-loop game window renderer resources))))))
 
 (defun run (game)
-  (sdl2-ttf:init)
   (with-sdl2-images (:png)
     (with-surfaces (surfaces)
       (sdl2:with-init (:video)
         (main-window game surfaces)))))
 
-(defclass platformer (game)
-  ())
-
 (defun main ()
-  (let ((game (make-instance 'platformer)))
+  (let ((game (make-instance 'game)))
     (run game)))
