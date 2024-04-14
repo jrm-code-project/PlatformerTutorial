@@ -5,7 +5,7 @@
 (defgeneric get-frame (animation))
 
 (defclass frame-set ()
-  ((atlas           :initarg :atlas     :reader atlas)
+  ((atlas           :initarg :atlas            :reader atlas)
    (row             :initarg :row              :reader get-row)
    (ticks-per-frame :initarg :ticks-per-frame  :reader ticks-per-frame)))
 
