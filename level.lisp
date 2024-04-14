@@ -42,7 +42,7 @@
   (call-next-method))
 
 (defmethod mode-step! (game (level level) dticks)
-  (cond ((sdl2:keyboard-state-p :scancode-escape)
+  (cond ((sdl2:keyboard-state-p :scancode-backspace)
          (setf (mode game) (menu game)))
         (t (call-next-method))))
 
