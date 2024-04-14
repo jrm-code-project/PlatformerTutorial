@@ -5,7 +5,7 @@
 (defgeneric get-frame (animation))
 
 (defclass frame-set ()
-  ((atlas    :initarg :atlas     :reader atlas)
+  ((atlas           :initarg :atlas     :reader atlas)
    (row             :initarg :row              :reader get-row)
    (ticks-per-frame :initarg :ticks-per-frame  :reader ticks-per-frame)))
 
@@ -34,23 +34,6 @@
     (mod absolute-frame (frame-set-length (frame-set frame-loop)))))
 
 ;;;;;;;;;;;
-;;; One-shot
-;;;   Runs once, then freezes
-
-(defclass one-shot (animation)
-  ())
-
-(defmethod get-frame ((one-shot one-shot))
-  (let* ((total-ticks (- (sdl2:get-ticks) (start-tick one-shot)))
-         (absolute-frame  (floor total-ticks (ticks-per-frame (frame-set one-shot)))))
-    (min absolute-frame (- (frame-set-length (frame-set one-shot)) 1))))
-
-(defun animation-finished? (one-shot)
-  (let* ((total-ticks (- (sdl2:get-ticks) (start-tick one-shot)))
-         (absolute-frame  (floor total-ticks (ticks-per-frame (frame-set one-shot)))))
-    (>= absolute-frame (frame-set-length (frame-set one-shot)))))
-
-;;;;;;;;;;;
 ;;; Load animations for the game
 
 (defun frame-loop-animation (atlas row)
@@ -60,14 +43,6 @@
                                   :ticks-per-frame 100)))
     (lambda ()
       (make-instance 'frame-loop :frame-set frame-set))))
-
-(defun one-shot-animation (atlas row)
-  (let ((frame-set (make-instance 'frame-set
-                                  :atlas atlas
-                                  :row row
-                                  :ticks-per-frame 100)))
-    (lambda ()
-      (make-instance 'one-shot :frame-set frame-set))))
 
 (defun make-animations (resources)
   `(:animations
@@ -86,18 +61,8 @@
                             :attack3)
                           #(5 6 3 1 2 4 3 3 3)
                           :baseline-offset 9)))
-        `(:attack1
-          ,(frame-loop-animation player-atlas :attack1)
-          :falling
-          ,(frame-loop-animation player-atlas :falling)
-          :hit
-          ,(one-shot-animation player-atlas :hit)
-          :idle
+        `(:idle
           ,(frame-loop-animation player-atlas :idle)
-          :jumping
-          ,(one-shot-animation player-atlas :jumping)
-          :landing
-          ,(one-shot-animation player-atlas :landing)
           :running
           ,(frame-loop-animation player-atlas :running))))
     ,@resources))
