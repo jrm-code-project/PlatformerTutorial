@@ -22,7 +22,7 @@
   (sdl2:render-present renderer))
 
 (defun game-step! (game dticks)
-  (entity-step! game (level game) (player (level game)) (get-state (player (level game))) dticks)
+  (level-step! game (level game) dticks)
   (sb-ext:atomic-incf (car (steps game))))
 
 (defconstant +ticks-per-second+ 1000)

@@ -41,6 +41,9 @@
   (render-tiles! renderer (get-resource '(:textures :outside) resources) (tiles level))
   (render-entity! renderer resources (player level)))
 
+(defun level-step! (game level dticks)
+  (entity-step! game (player level) (get-state (player level)) dticks))
+
 (defun make-level (resources)
   `(:level
     ,(let ((player (make-instance 'player

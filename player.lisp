@@ -33,7 +33,7 @@
 (defmethod (setf get-state) :after ((state (eql :running)) (player player))
   (start-animation! player :running))
 
-(defmethod entity-step! (game level (player player) (state (eql :idle)) dticks)
+(defmethod entity-step! (game (player player) (state (eql :idle)) dticks)
   (let ((l/r (l/r-input))
         (u/d (u/d-input)))
     (cond ((or (not (zerop l/r))
@@ -46,7 +46,7 @@
 
 (defun player-speed () (scalef .15))
 
-(defmethod entity-step! (game level (player player) (state (eql :running)) dticks)
+(defmethod entity-step! (game (player player) (state (eql :running)) dticks)
   (let* ((l/r (l/r-input))
          (u/d (u/d-input))
          (dx (* (player-speed) l/r dticks))
