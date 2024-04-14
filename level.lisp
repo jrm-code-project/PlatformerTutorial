@@ -44,7 +44,7 @@
 (defmethod mode-step! (game (level level) dticks)
   (cond ((sdl2:keyboard-state-p :scancode-escape)
          (setf (mode game) (menu game)))
-        (t (entity-step! game level (player game) (get-state (player game)) dticks))))
+        (t (entity-step! game level (player level) (get-state (player level)) dticks))))
 
 (defun blank-tile? (level tile-x tile-y)
   (and (>= tile-x 0)

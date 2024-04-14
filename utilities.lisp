@@ -28,6 +28,4 @@
                 (t (error "Non list in fold-left.")))))))
 
 (defun get-resource (key resources)
-  (cond ((consp key) (get-resource (cdr key) (getf resources (car key))))
-        ((null key) resources)
-        (t (error "Dotted list."))))
+  (fold-left #'get resources key))
