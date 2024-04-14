@@ -28,4 +28,4 @@
                 (t (error "Non list in fold-left.")))))))
 
 (defun get-resource (key resources)
-  (fold-left #'get resources key))
+  (fold-left #'getf resources key))
