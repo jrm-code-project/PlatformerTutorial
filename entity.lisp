@@ -22,9 +22,6 @@
 (defun start-animation! (entity animation)
   (setf (get-animation entity) (funcall (getf (animations entity) animation))))
 
-(defgeneric enemy? (entity)
-  (:method ((entity entity)) nil))
-
 ;;;;;;;;;;;;;;;;;
 ;;; Hitbox Mix-in
 ;;;   Gives a width and height to an entity

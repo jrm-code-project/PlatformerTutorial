@@ -7,26 +7,6 @@
    (first-level :accessor first-level)
    (steps   :initform (cons 0 nil) :accessor steps)))
 
-(defgeneric call-with-surfaces (game receiver)
-  (:method (game receiver)
-    (funcall receiver nil)))
-
-(defmacro with-surfaces ((surfaces game) &body body)
-  `(CALL-WITH-SURFACES
-    ,game
-    (LAMBDA (,surfaces)
-      ,@body)))
-
-(defgeneric call-with-resources (game surfaces renderer receiver)
-  (:method (game surfaces renderer receiver)
-    (funcall receiver nil)))
-
-(defmacro with-resources (((resources) game surfaces renderer) &body body)
-  `(CALL-WITH-RESOURCES
-    ,game ,surfaces ,renderer
-    (LAMBDA (,resources)
-      ,@body)))
-
 (defun initialize-game! (game resources)
   (setf (first-level game) (getf resources :level)
         (level game)  (getf resources :level)))
@@ -42,7 +22,7 @@
   (sdl2:render-present renderer))
 
 (defun game-step! (game dticks)
-  (entity-step! game (level game) (player (level game)) (get-state (player (level game))) dticks)
+  (level-step! game (level game) dticks)
   (sb-ext:atomic-incf (car (steps game))))
 
 (defconstant +ticks-per-second+ 1000)

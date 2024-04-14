@@ -2,33 +2,6 @@
 
 (in-package "TUTORIAL")
 
-(defun call-with-open-font (font-path size receiver)
-  (let ((font nil))
-    (unwind-protect
-         (progn (setq font (sdl2-ttf:open-font font-path size))
-                (funcall receiver font))
-      (when font
-        (sdl2-ttf:close-font font)))))
-
-(defmacro with-open-font ((font font-path size) &body body)
-  `(CALL-WITH-OPEN-FONT ,font-path ,size
-     (LAMBDA (,font)
-       ,@body)))
-
-(defun call-with-rendered-text (font text r g b a receiver)
-  (let ((surface nil))
-    (unwind-protect
-         (progn (setq surface (sdl2-ttf:render-text-solid font text r g b a))
-                (funcall receiver surface))
-      (when surface
-        ;(sdl2:free-surface surface)
-        ))))
-
-(defmacro with-rendered-text ((surface font text r g b a) &body body)
-  `(CALL-WITH-RENDERED-TEXT ,font ,text ,r ,g ,b ,a
-     (LAMBDA (,surface)
-       ,@body)))
-
 (defun call-with-sdl2-images (formats thunk)
   "Initialize the SDL2 image library with the given FORMATS and call THUNK."
   (unwind-protect
@@ -92,35 +65,7 @@
       (:quit () t)
       )))
 
-(defun main-window (game surfaces)
-  (sdl2:with-window (window
-                     :w (game-width)
-                     :h (game-height)
-                     :flags '(:shown))
-    (sdl2:with-renderer (renderer window :index -1 :flags '(:accelerated))
-      (with-resources ((resources) game surfaces renderer)
-        (initialize-game! game resources)
-        (with-game-loop (game)
-          (main-event-loop game window renderer resources))))))
-
-(defun run (game)
-  (sdl2-ttf:init)
-  (with-sdl2-images (:png)
-    (with-surfaces (surfaces game)
-      (sdl2:with-init (:video)
-        (main-window game surfaces)))))
-
-(defclass platformer (game)
-  ())
-
-(defmethod call-with-surfaces ((game platformer) receiver)
-  (let-surfaces ((outside-sprites-surface     (resource-pathname "outside_sprites.png"))
-                 (player-sprites-surface      (resource-pathname "player_sprites.png")))
-    (funcall receiver
-             `(:outside             ,outside-sprites-surface
-               :player              ,player-sprites-surface))))
-
-(defmethod call-with-resources ((game platformer) surfaces renderer receiver)
+(defun call-with-resources (surfaces renderer receiver)
   (let-texture (renderer
                 (outside-sprites-texture (getf surfaces :outside))
                 (player-sprites-texture  (getf surfaces :player)))
@@ -133,6 +78,29 @@
                      #'make-level
                      receiver))))
 
+(defmacro with-resources (((resources) surfaces renderer) &body body)
+  `(CALL-WITH-RESOURCES
+    ,surfaces ,renderer
+    (LAMBDA (,resources)
+      ,@body)))
+
+(defun main-window (game surfaces)
+  (sdl2:with-window (window
+                     :w (game-width)
+                     :h (game-height)
+                     :flags '(:shown))
+    (sdl2:with-renderer (renderer window :index -1 :flags '(:accelerated))
+      (with-resources ((resources) surfaces renderer)
+        (initialize-game! game resources)
+        (with-game-loop (game)
+          (main-event-loop game window renderer resources))))))
+
+(defun run (game)
+  (with-sdl2-images (:png)
+    (with-surfaces (surfaces)
+      (sdl2:with-init (:video)
+        (main-window game surfaces)))))
+
 (defun main ()
-  (let ((game (make-instance 'platformer)))
+  (let ((game (make-instance 'game)))
     (run game)))

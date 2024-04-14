@@ -8,8 +8,6 @@
 (defun resource-pathname (namestring)
   (merge-pathnames (parse-namestring namestring) (resource-directory)))
 
-(defun text-font () (resource-pathname "Inconsolata-Regular.ttf"))
-
 (defun level-files ()
   (sort
    (directory (merge-pathnames (make-pathname :directory '(:relative "levels")
@@ -51,3 +49,14 @@
     ,@(map 'list (lambda (binding)
                    `(PROGN ,@(cdr binding)))
            bindings)))
+
+(defun call-with-surfaces (receiver)
+  (let-surfaces ((outside-sprites-surface     (resource-pathname "outside_sprites.png"))
+                 (player-sprites-surface      (resource-pathname "player_sprites.png")))
+    (funcall receiver
+             `(:outside             ,outside-sprites-surface
+               :player              ,player-sprites-surface))))
+
+(defmacro with-surfaces ((surfaces) &body body)
+  `(CALL-WITH-SURFACES
+    (LAMBDA (,surfaces) ,@body)))

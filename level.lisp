@@ -41,6 +41,9 @@
   (render-tiles! renderer (get-resource '(:textures :outside) resources) (tiles level))
   (render-entity! renderer resources (player level)))
 
+(defun level-step! (game level dticks)
+  (entity-step! game level (player level) (get-state (player level)) dticks))
+
 (defun blank-tile? (level tile-x tile-y)
   (and (>= tile-x 0)
        (< tile-x (level-tiles-width (tiles level)))
