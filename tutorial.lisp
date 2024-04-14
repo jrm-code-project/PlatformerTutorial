@@ -78,7 +78,7 @@
                      #'make-level
                      receiver))))
 
-(defmacro with-resources (((resources) surfaces renderer) &body body)
+(defmacro with-resources ((resources surfaces renderer) &body body)
   `(CALL-WITH-RESOURCES
     ,surfaces ,renderer
     (LAMBDA (,resources)
@@ -90,7 +90,7 @@
                      :h (game-height)
                      :flags '(:shown))
     (sdl2:with-renderer (renderer window :index -1 :flags '(:accelerated))
-      (with-resources ((resources) surfaces renderer)
+      (with-resources (resources surfaces renderer)
         (initialize-game! game resources)
         (with-game-loop (game)
           (main-event-loop game window renderer resources))))))
