@@ -2,33 +2,6 @@
 
 (in-package "TUTORIAL")
 
-(defun call-with-open-font (font-path size receiver)
-  (let ((font nil))
-    (unwind-protect
-         (progn (setq font (sdl2-ttf:open-font font-path size))
-                (funcall receiver font))
-      (when font
-        (sdl2-ttf:close-font font)))))
-
-(defmacro with-open-font ((font font-path size) &body body)
-  `(CALL-WITH-OPEN-FONT ,font-path ,size
-     (LAMBDA (,font)
-       ,@body)))
-
-(defun call-with-rendered-text (font text r g b a receiver)
-  (let ((surface nil))
-    (unwind-protect
-         (progn (setq surface (sdl2-ttf:render-text-solid font text r g b a))
-                (funcall receiver surface))
-      (when surface
-        ;(sdl2:free-surface surface)
-        ))))
-
-(defmacro with-rendered-text ((surface font text r g b a) &body body)
-  `(CALL-WITH-RENDERED-TEXT ,font ,text ,r ,g ,b ,a
-     (LAMBDA (,surface)
-       ,@body)))
-
 (defun call-with-sdl2-images (formats thunk)
   "Initialize the SDL2 image library with the given FORMATS and call THUNK."
   (unwind-protect
@@ -91,17 +64,6 @@
 
       (:quit () t)
       )))
-
-(defun call-with-surfaces (receiver)
-  (let-surfaces ((outside-sprites-surface     (resource-pathname "outside_sprites.png"))
-                 (player-sprites-surface      (resource-pathname "player_sprites.png")))
-    (funcall receiver
-             `(:outside             ,outside-sprites-surface
-               :player              ,player-sprites-surface))))
-
-(defmacro with-surfaces ((surfaces) &body body)
-  `(CALL-WITH-SURFACES
-    (LAMBDA (,surfaces) ,@body)))
 
 (defun call-with-resources (surfaces renderer receiver)
   (let-texture (renderer
