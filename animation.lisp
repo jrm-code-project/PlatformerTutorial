@@ -5,7 +5,7 @@
 (defgeneric get-frame (animation))
 
 (defclass frame-set ()
-  ((atlas    :initarg :atlas     :reader atlas)
+  ((atlas           :initarg :atlas            :reader atlas)
    (row             :initarg :row              :reader get-row)
    (ticks-per-frame :initarg :ticks-per-frame  :reader ticks-per-frame)))
 
@@ -121,12 +121,8 @@
                             :attack3)
                           #(5 6 3 1 2 4 3 3 3)
                           :baseline-offset 9)))
-        `(:attack1
-          ,(frame-loop-animation player-atlas :attack1)
-          :falling
+        `(:falling
           ,(frame-loop-animation player-atlas :falling)
-          :hit
-          ,(one-shot-animation player-atlas :hit)
           :idle
           ,(frame-loop-animation player-atlas :idle)
           :jumping
