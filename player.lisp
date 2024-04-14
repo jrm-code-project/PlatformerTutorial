@@ -105,6 +105,6 @@
          (setf (get-state player) :falling))
         ((sdl2:keyboard-state-p :scancode-up)
          (setf (get-state player) :jumping))
-        ((zerop l/r)
+        ((zerop (l/r-input))
          (setf (get-state player) :idle))
         (t (move-player-horizontally! level player dticks))))
