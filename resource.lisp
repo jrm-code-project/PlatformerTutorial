@@ -106,7 +106,7 @@
                :urm-button-atlas    ,urm-button-atlas-surface
                :volume-button-atlas ,volume-button-atlas-surface))))
 
-(defmacro with-surfaces ((surfaces game) &body body)
+(defmacro with-surfaces ((surfaces) &body body)
   `(CALL-WITH-SURFACES
     ,game
     (LAMBDA (,surfaces)
