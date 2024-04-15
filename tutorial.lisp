@@ -123,9 +123,6 @@
       (sdl2:with-init (:video)
         (main-window game surfaces)))))
 
-(defclass platformer (game)
-  ())
-
 (defun main ()
   (let ((game (make-instance 'game)))
     (run game)))
