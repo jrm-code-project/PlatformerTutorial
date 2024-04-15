@@ -10,6 +10,33 @@
 
 (defun text-font () (resource-pathname "Inconsolata-Regular.ttf"))
 
+(defun call-with-open-font (font-path size receiver)
+  (let ((font nil))
+    (unwind-protect
+         (progn (setq font (sdl2-ttf:open-font font-path size))
+                (funcall receiver font))
+      (when font
+        (sdl2-ttf:close-font font)))))
+
+(defmacro with-open-font ((font font-path size) &body body)
+  `(CALL-WITH-OPEN-FONT ,font-path ,size
+     (LAMBDA (,font)
+       ,@body)))
+
+(defun call-with-rendered-text (font text r g b a receiver)
+  (let ((surface nil))
+    (unwind-protect
+         (progn (setq surface (sdl2-ttf:render-text-solid font text r g b a))
+                (funcall receiver surface))
+      (when surface
+        ;(sdl2:free-surface surface)
+        ))))
+
+(defmacro with-rendered-text ((surface font text r g b a) &body body)
+  `(CALL-WITH-RENDERED-TEXT ,font ,text ,r ,g ,b ,a
+     (LAMBDA (,surface)
+       ,@body)))
+
 (defun level-files ()
   (sort
    (directory (merge-pathnames (make-pathname :directory '(:relative "levels")
