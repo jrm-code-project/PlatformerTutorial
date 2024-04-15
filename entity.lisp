@@ -78,12 +78,6 @@
   (or (point-against-right-wall? level (get-right entity) (get-top entity))
       (point-against-right-wall? level (get-right entity) (get-bottom entity))))
 
-(defun unsupported-on-left? (level entity)
-  (not (point-supported? level (get-left entity) (get-bottom entity))))
-
-(defun unsupported-on-right? (level entity)
-  (not (point-supported? level (get-right entity) (get-bottom entity))))
-
 (defun move-entity-left! (level entity dx)
   (let ((x1 (move-point-left level
                               (get-left entity)
