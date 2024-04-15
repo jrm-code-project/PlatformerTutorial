@@ -108,7 +108,6 @@
 
 (defmacro with-surfaces ((surfaces) &body body)
   `(CALL-WITH-SURFACES
-    ,game
     (LAMBDA (,surfaces)
       ,@body)))
 
