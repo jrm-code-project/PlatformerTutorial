@@ -79,7 +79,7 @@
                    `(PROGN ,@(cdr binding)))
            bindings)))
 
-(defmethod call-with-surfaces ((game platformer) receiver)
+(defun call-with-surfaces (receiver)
   (let-surfaces ((button-atlas-surface        (resource-pathname "button_atlas.png"))
                  (menu-surface                (resource-pathname "menu_background.png"))
                  (menu-background-surface     (resource-pathname "background_menu.png"))
@@ -102,7 +102,6 @@
 
 (defmacro with-surfaces ((surfaces) &body body)
   `(CALL-WITH-SURFACES
-    ,game
     (LAMBDA (,surfaces)
       ,@body)))
 
