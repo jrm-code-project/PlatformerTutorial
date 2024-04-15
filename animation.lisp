@@ -5,7 +5,7 @@
 (defgeneric get-frame (animation))
 
 (defclass frame-set ()
-  ((atlas    :initarg :atlas     :reader atlas)
+  ((atlas           :initarg :atlas            :reader atlas)
    (row             :initarg :row              :reader get-row)
    (ticks-per-frame :initarg :ticks-per-frame  :reader ticks-per-frame)))
 
@@ -52,7 +52,7 @@
 
 ;;;;;;;;;;;;
 ;;; Slides
-;;;   Select the current-slide to show. 
+;;;   Select the current-slide to show.
 
 (defclass slides (animation)
   ((current-slide :initarg :current-slide :accessor current-slide)
@@ -117,9 +117,7 @@
                             :dying)
                           #(9 6 7 4 5)
                           :baseline-offset 4)))
-        `(:attack
-          ,(frame-loop-animation crabby-atlas :attack)
-          :dying
+        `(:dying
           ,(frame-loop-animation crabby-atlas :dying)
           :hit
           ,(frame-loop-animation crabby-atlas :hit)                                            
@@ -146,8 +144,6 @@
           ,(frame-loop-animation player-atlas :attack1)
           :falling
           ,(frame-loop-animation player-atlas :falling)
-          :hit
-          ,(one-shot-animation player-atlas :hit)
           :idle
           ,(frame-loop-animation player-atlas :idle)
           :jumping

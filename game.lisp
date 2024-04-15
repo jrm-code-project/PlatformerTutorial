@@ -4,38 +4,20 @@
 
 (defclass game ()
   ((mode        :accessor mode)
+   (game-over   :accessor game-over)
    (level       :accessor level)
    (first-level :accessor first-level)
    (menu        :accessor menu)
    (paused-menu :accessor paused-menu)
    (steps   :initform (cons 0 nil) :accessor steps)))
 
-(defgeneric call-with-surfaces (game receiver)
-  (:method (game receiver)
-    (funcall receiver nil)))
-
-(defmacro with-surfaces ((surfaces game) &body body)
-  `(CALL-WITH-SURFACES
-    ,game
-    (LAMBDA (,surfaces)
-      ,@body)))
-
-(defgeneric call-with-resources (game surfaces renderer receiver)
-  (:method (game surfaces renderer receiver)
-    (funcall receiver nil)))
-
-(defmacro with-resources (((resources) game surfaces renderer) &body body)
-  `(CALL-WITH-RESOURCES
-    ,game ,surfaces ,renderer
-    (LAMBDA (,resources)
-      ,@body)))
-
 (defun initialize-game! (game resources)
   (setf (first-level game) (getf resources :level)
         (paused-menu game) (getf resources :pause-menu)
         (mode game)   (getf resources :menu)
         (level game)  (getf resources :level)
-        (menu game)   (getf resources :menu)))
+        (menu game)   (getf resources :menu)
+        (game-over game) (getf resources :game-over)))
 
 (defun render-game! (renderer game resources)
   ;; Clear any old image
