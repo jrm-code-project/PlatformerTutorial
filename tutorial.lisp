@@ -121,7 +121,7 @@
 (defun run (game)
   (sdl2-ttf:init)
   (with-sdl2-images (:png)
-    (with-surfaces (surfaces game)
+    (with-surfaces (surfaces)
       (sdl2:with-init (:video)
         (main-window game surfaces)))))
 
