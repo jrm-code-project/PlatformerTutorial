@@ -156,6 +156,17 @@
           ,(one-shot-animation player-atlas :landing)
           :running
           ,(frame-loop-animation player-atlas :running)))
+     :potions
+     ,(let ((potions-atlas
+              (make-atlas (get-resource '(:textures :potions) resources)
+                          (lambda (textures) (getf textures :potions))
+                          #(:blue
+                            :red)
+                          #(7 7))))
+        `(:blue
+          ,(frame-loop-animation potions-atlas :blue)
+          :red
+          ,(frame-loop-animation potions-atlas :red)))
      :sound-buttons
      ,(let ((button-atlas
               (make-atlas (get-resource '(:textures :sound-button-atlas) resources)

@@ -78,6 +78,10 @@
                                               "macros"
                                               "package"
                                               "parameters"))
+               (:file "potion"   :depends-on ("entity"
+                                              "macros"
+                                              "package"
+                                              "parameters"))
                (:file "resource" :depends-on ("package"))
                (:file "texture"  :depends-on ("package"
                                               "resource"))

@@ -224,6 +224,20 @@
                                     :animation (funcall (get-resource '(:animations :crabby :idle) resources))
                                     :animations (get-resource '(:animations :crabby) resources))
                      entities))
+              ((= (aref tiles i j 2) 2)
+               (push (make-instance 'blue-potion
+                                    :x (+ (/ (tile-size) 2) (* i (tile-size)))
+                                    :y (- (* (+ j 1) (tile-size)) 1 (scale 5))
+                                    :state :idle
+                                    :animation (funcall (get-resource '(:animations :potions :blue) resources)))
+                     entities))
+              ((= (aref tiles i j 2) 3)
+               (push (make-instance 'red-potion
+                                    :x (+ (/ (tile-size) 2) (* i (tile-size)))
+                                    :y (- (* (+ j 1) (tile-size)) 1 (scale 5))
+                                    :state :idle
+                                    :animation (funcall (get-resource '(:animations :potions :red) resources)))
+                     entities))
               (t nil))))
     (make-instance 'level
                    :tiles tiles

@@ -78,6 +78,7 @@
                 (pause-menu-texture      (getf surfaces :pause-menu))
                 (player-sprites-texture  (getf surfaces :player))
                 (playing-background-texture (getf surfaces :playing-background))
+                (potions-texture         (getf surfaces :potions))
                 (small-clouds-texture    (getf surfaces :small-clouds))
                 (sound-atlas-texture     (getf surfaces :sound-button-atlas))
                 (urm-atlas-texture       (getf surfaces :urm-button-atlas))
@@ -97,6 +98,7 @@
                   :pause-menu          ,pause-menu-texture
                   :playing-background  ,playing-background-texture
                   :player              ,player-sprites-texture
+                  :potions             ,potions-texture
                   :small-clouds        ,small-clouds-texture
                   :sound-button-atlas  ,sound-atlas-texture
                   :urm-button-atlas    ,urm-atlas-texture

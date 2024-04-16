@@ -91,6 +91,7 @@
                  (pause-menu-surface          (resource-pathname "pause_menu.png"))
                  (player-sprites-surface      (resource-pathname "player_sprites.png"))
                  (playing-background-surface  (resource-pathname "playing_bg_img.png"))
+                 (potions-surface             (resource-pathname "potions_sprites.png"))
                  (small-clouds-surface        (resource-pathname "small_clouds.png"))
                  (sound-button-atlas-surface  (resource-pathname "sound_button.png"))
                  (urm-button-atlas-surface    (resource-pathname "urm_buttons.png"))
@@ -110,6 +111,7 @@
                    :pause-menu          ,pause-menu-surface
                    :player              ,player-sprites-surface
                    :playing-background  ,playing-background-surface
+                   :potions             ,potions-surface
                    :small-clouds        ,small-clouds-surface
                    :sound-button-atlas  ,sound-button-atlas-surface
                    :urm-button-atlas    ,urm-button-atlas-surface

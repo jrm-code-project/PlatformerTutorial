@@ -81,6 +81,7 @@
         ((= 1 (get-frame (get-animation player)))
          (dolist (entity (entities level))
            (when (and (get-state entity)
+                      (has-hitbox? entity)
                       (can-attack? player entity)
                       (not (member (get-state entity) '(:hit :dying))))
              (hit! entity)

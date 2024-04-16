@@ -52,6 +52,10 @@
   ((width  :initarg :width  :reader get-width)
    (height :initarg :height :reader get-height)))
 
+(defgeneric has-hitbox? (entity)
+  (:method ((entity entity)) nil)
+  (:method ((entity hitbox)) t))
+
 (defun get-left (entity)
   (- (get-x entity) (/ (get-width entity) 2)))
 
