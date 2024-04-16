@@ -29,6 +29,14 @@
   ())
 
 (defmethod render-mode! (renderer resources game (pause-menu pause-menu))
+  (render-mode! renderer resources game (level game))
+
+  (sdl2:set-render-draw-blend-mode renderer :blend)
+  (sdl2:set-render-draw-color renderer #x00 #x00 #x00 #x3f)
+  (sdl2:with-rects ((r 0 0 (game-width) (game-height)))
+    (sdl2:render-fill-rect renderer r))
+  (sdl2:set-render-draw-blend-mode renderer :none)
+
   (let ((background-texture (get-resource '(:textures :pause-menu) resources)))
     (sdl2:with-rects ((src 0
                            0

@@ -71,6 +71,7 @@
                 (crabby-atlas-texture    (getf surfaces :crabby-atlas))
                 (game-over-texture       (getf surfaces :game-over))
                 (health-bar-texture      (getf surfaces :health-bar))
+                (level-complete-texture  (getf surfaces :level-complete))
                 (menu-texture            (getf surfaces :menu))
                 (menu-background-texture (getf surfaces :menu-background))
                 (outside-sprites-texture (getf surfaces :outside))
@@ -89,6 +90,7 @@
                   :crabby              ,crabby-atlas-texture
                   :game-over           ,game-over-texture
                   :health-bar          ,health-bar-texture
+                  :level-complete      ,level-complete-texture
                   :menu                ,menu-texture
                   :menu-background     ,menu-background-texture
                   :outside             ,outside-sprites-texture
@@ -100,10 +102,11 @@
                   :urm-button-atlas    ,urm-atlas-texture
                   :volume-button-atlas ,volume-atlas-texture))
                (list #'make-animations
-                     #'make-level
+                     #'make-game-over
+                     #'make-level-complete
+                     #'make-levels
                      #'make-menu
                      #'make-pause-menu
-                     #'make-game-over
                      receiver))))
 
 (defmacro with-resources ((resources surfaces renderer) &body body)

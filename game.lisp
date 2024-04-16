@@ -9,14 +9,16 @@
    (first-level :accessor first-level)
    (menu        :accessor menu)
    (paused-menu :accessor paused-menu)
+   (level-complete :accessor level-complete)
    (steps   :initform (cons 0 nil) :accessor steps)))
 
 (defun initialize-game! (game resources)
-  (setf (first-level game) (getf resources :level)
+  (setf (first-level game) (getf resources :first-level)
         (paused-menu game) (getf resources :pause-menu)
         (mode game)   (getf resources :menu)
-        (level game)  (getf resources :level)
+        (level game)  (getf resources :first-level)
         (menu game)   (getf resources :menu)
+        (level-complete game) (getf resources :level-complete)
         (game-over game) (getf resources :game-over)))
 
 (defun render-game! (renderer game resources)

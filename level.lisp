@@ -14,8 +14,8 @@
 (defun-scaled health-bar-height 4)
 
 (defclass level (mode)
-  ((player   :initarg :player   :accessor player)
-   (tiles    :initarg :tiles    :accessor tiles)
+  ((player   :initarg :player   :reader player)
+   (tiles    :initarg :tiles    :reader tiles)
    (x-offset :initform 0        :accessor x-offset)
    (cloud-heights :initform
                   (do ((l '() (cons (+ (small-cloud-minimum-y)
@@ -24,7 +24,9 @@
                                     l))
                        (i 0 (1+ i)))
                       ((>= i 10) l))
-                  :reader get-cloud-heights)))
+                  :reader get-cloud-heights)
+   (restart-level :initarg :restart-level :reader restart-level)
+   (next-level    :initarg :next-level    :reader next-level)))
 
 (defun render-big-clouds! (renderer big-cloud-texture)
   (dotimes (i 3)
@@ -129,7 +131,15 @@
          (setf (mode game) (menu game)))
         ((sdl2:keyboard-state-p :scancode-escape)
          (setf (mode game) (paused-menu game)))
-        (t (call-next-method))))
+        ((find-if (lambda (entity)
+                    (and (enemy? entity)
+                         (get-state entity)))
+                  (entities level))
+         (call-next-method))
+        ((next-level (level game))
+         (setf (mode game) (level-complete game)))
+        (t
+         (setf (mode game) (game-over game)))))
 
 (defun blank-tile? (level tile-x tile-y)
   (and (>= tile-x 0)
@@ -193,32 +203,40 @@
         (+ y dy)
         (tile-top (+ tile-y 1)))))
 
-(defun make-level (resources)
-  `(:level
-    ,(let ((player nil)
-           (entities nil)
-           (level-tiles (car (read-level-data))))
-       (dotimes (i (level-tiles-width level-tiles))
-         (dotimes (j (level-tiles-height level-tiles))
-           (cond ((= 100 (aref level-tiles i j 1))
-                  (setq player
-                        (make-instance 'player
-                                       :x (+ (/ (tile-size) 2) (* i (tile-size)))
-                                       :y (- (* (+ j 1) (tile-size)) 1)
-                                       :state :idle
-                                       :animation (funcall (get-resource '(:animations :player :idle) resources))
-                                       :animations (get-resource '(:animations :player) resources))))
-                 ((zerop (aref level-tiles i j 1))
-                  (push (make-instance 'crabby
-                                       :x (+ (/ (tile-size) 2) (* i (tile-size)))
-                                       :y (- (* (+ j 1) (tile-size)) 1)
-                                       :state :idle
-                                       :animation (funcall (get-resource '(:animations :crabby :idle) resources))
-                                       :animations (get-resource '(:animations :crabby) resources))
-                        entities))
-                 (t nil))))
-       (make-instance 'level
-                      :tiles level-tiles
-                      :player player
-                      :entities (cons player entities)))
+(defun make-level (resources next-level tiles)
+  (let ((player nil)
+        (entities nil))
+    (dotimes (i (level-tiles-width tiles))
+      (dotimes (j (level-tiles-height tiles))
+        (cond ((= 100 (aref tiles i j 1))
+               (setq player
+                     (make-instance 'player
+                                    :x (+ (/ (tile-size) 2) (* i (tile-size)))
+                                    :y (- (* (+ j 1) (tile-size)) 1)
+                                    :state :idle
+                                    :animation (funcall (get-resource '(:animations :player :idle) resources))
+                                    :animations (get-resource '(:animations :player) resources))))
+              ((zerop (aref tiles i j 1))
+               (push (make-instance 'crabby
+                                    :x (+ (/ (tile-size) 2) (* i (tile-size)))
+                                    :y (- (* (+ j 1) (tile-size)) 1)
+                                    :state :idle
+                                    :animation (funcall (get-resource '(:animations :crabby :idle) resources))
+                                    :animations (get-resource '(:animations :crabby) resources))
+                     entities))
+              (t nil))))
+    (make-instance 'level
+                   :tiles tiles
+                   :player player
+                   :entities (cons player entities)
+                   :restart-level (lambda ()
+                                    (make-level resources next-level tiles))
+                   :next-level next-level)))
+
+(defun make-levels (resources)
+  `(:first-level
+    ,(fold-left (lambda (next-level tile-map)
+                  (make-level resources next-level tile-map))
+                nil
+                (reverse (read-level-data)))
     ,@resources))

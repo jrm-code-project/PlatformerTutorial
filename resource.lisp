@@ -84,6 +84,7 @@
                  (button-atlas-surface        (resource-pathname "button_atlas.png"))
                  (crabby-atlas-surface        (resource-pathname "crabby_sprite.png"))
                  (health-bar-surface          (resource-pathname "health_power_bar.png"))
+                 (level-complete-surface      (resource-pathname "completed_sprite.png"))
                  (menu-surface                (resource-pathname "menu_background.png"))
                  (menu-background-surface     (resource-pathname "background_menu.png"))
                  (outside-sprites-surface     (resource-pathname "outside_sprites.png"))
@@ -102,6 +103,7 @@
                    :crabby-atlas        ,crabby-atlas-surface
                    :game-over           ,game-over-surface
                    :health-bar          ,health-bar-surface
+                   :level-complete      ,level-complete-surface
                    :menu                ,menu-surface
                    :menu-background     ,menu-background-surface
                    :outside             ,outside-sprites-surface

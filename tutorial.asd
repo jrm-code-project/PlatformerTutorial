@@ -47,6 +47,12 @@
                                               "resource"
                                               "texture"
                                               "utilities"))
+               (:file "level-complete" :depends-on ("game"
+                                                    "macros"
+                                                    "mode"
+                                                    "package"
+                                                    "parameters"
+                                                    "utilities"))
                (:file "macros"   :depends-on ("package"))
                (:file "menu"     :depends-on ("game"
                                               "macros"
