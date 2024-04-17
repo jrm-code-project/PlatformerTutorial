@@ -87,6 +87,10 @@
                                               "package"
                                               "parameters"))
                (:file "resource" :depends-on ("package"))
+               (:file "spikes"   :depends-on ("entity"
+                                              "macros"
+                                              "package"
+                                              "parameters"))
                (:file "texture"  :depends-on ("package"
                                               "resource"))
                (:file "tutorial" :depends-on ("animation"

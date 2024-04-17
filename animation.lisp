@@ -200,7 +200,14 @@
           ,(button-animation button-atlas :on)
           :off
           ,(button-animation button-atlas :off)))
-
+     :spikes
+     ,(let ((spikes-atlas
+              (make-atlas (get-resource '(:textures :spikes) resources)
+                          (lambda (textures) (getf textures :spikes))
+                          #(:idle)
+                          #(1))))
+        `(:idle
+          ,(freeze-animation spikes-atlas :idle)))
      :urm-buttons
      ,(let ((button-atlas
               (make-atlas (get-resource '(:textures :urm-button-atlas) resources)

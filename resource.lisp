@@ -94,6 +94,7 @@
                  (playing-background-surface  (resource-pathname "playing_bg_img.png"))
                  (potions-surface             (resource-pathname "potions_sprites.png"))
                  (small-clouds-surface        (resource-pathname "small_clouds.png"))
+                 (spikes-surface              (resource-pathname "trap_atlas.png"))
                  (sound-button-atlas-surface  (resource-pathname "sound_button.png"))
                  (urm-button-atlas-surface    (resource-pathname "urm_buttons.png"))
                  (volume-button-atlas-surface (resource-pathname "volume_buttons.png")))
@@ -116,6 +117,7 @@
                    :potions             ,potions-surface
                    :small-clouds        ,small-clouds-surface
                    :sound-button-atlas  ,sound-button-atlas-surface
+                   :spikes              ,spikes-surface
                    :urm-button-atlas    ,urm-button-atlas-surface
                    :volume-button-atlas ,volume-button-atlas-surface))))))
 

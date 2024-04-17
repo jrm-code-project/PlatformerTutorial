@@ -269,6 +269,13 @@
                                     :state :idle
                                     :animation (funcall (get-resource '(:animations :potions :red) resources)))
                      entities))
+              ((= (aref tiles i j 2) 4)
+               (push (make-instance 'spikes
+                                    :x (+ (/ (tile-size) 2) (* i (tile-size)))
+                                    :y (- (* (+ j 1) (tile-size)) 1)
+                                    :state :idle
+                                    :animation (funcall (get-resource '(:animations :spikes :idle) resources)))
+                     entities))
               (t nil))))
     (make-instance 'level
                    :tiles tiles

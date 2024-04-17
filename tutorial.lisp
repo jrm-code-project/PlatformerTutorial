@@ -82,6 +82,7 @@
                 (potions-texture         (getf surfaces :potions))
                 (small-clouds-texture    (getf surfaces :small-clouds))
                 (sound-atlas-texture     (getf surfaces :sound-button-atlas))
+                (spikes-texture          (getf surfaces :spikes))
                 (urm-atlas-texture       (getf surfaces :urm-button-atlas))
                 (volume-atlas-texture    (getf surfaces :volume-button-atlas)))
     (fold-left (lambda (resources constructor)
@@ -103,6 +104,7 @@
                   :potions             ,potions-texture
                   :small-clouds        ,small-clouds-texture
                   :sound-button-atlas  ,sound-atlas-texture
+                  :spikes              ,spikes-texture
                   :urm-button-atlas    ,urm-atlas-texture
                   :volume-button-atlas ,volume-atlas-texture))
                (list #'make-animations
