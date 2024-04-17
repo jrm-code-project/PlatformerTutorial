@@ -224,6 +224,37 @@
                                     :animation (funcall (get-resource '(:animations :crabby :idle) resources))
                                     :animations (get-resource '(:animations :crabby) resources))
                      entities))
+              ((= (aref tiles i j 2) 0)
+               (let* ((potion (make-instance 'blue-potion
+                                    :x (+ (/ (tile-size) 2) (* i (tile-size)))
+                                    :y (- (* (+ j 1) (tile-size)) 1 (scale 5))
+                                    :state nil
+                                    :animation (funcall (get-resource '(:animations :potions :blue) resources))))
+                      (box (make-instance 'box
+                                    :x (+ (/ (tile-size) 2) (* i (tile-size)))
+                                    :y (- (* (+ j 1) (tile-size)) 1)
+                                    :state :idle
+                                    :contents potion
+                                    :animation (funcall (get-resource '(:animations :container :box) resources))
+                                    :animations (get-resource '(:animations :container) resources))))
+                 (push potion entities)
+                 (push box entities)))
+              ((= (aref tiles i j 2) 1)
+               (let* ((potion (make-instance
+                               'red-potion
+                               :x (+ (/ (tile-size) 2) (* i (tile-size)))
+                               :y (- (* (+ j 1) (tile-size)) 1 (scale 5))
+                               :state nil
+                               :animation (funcall (get-resource '(:animations :potions :red) resources))))
+                     (barrel (make-instance 'barrel
+                                    :x (+ (/ (tile-size) 2) (* i (tile-size)))
+                                    :y (- (* (+ j 1) (tile-size)) 1)
+                                    :contents potion
+                                    :state :idle
+                                    :animation (funcall (get-resource '(:animations :container :barrel) resources))
+                                    :animations (get-resource '(:animations :container) resources))))
+                 (push potion entities)
+                 (push barrel entities)))
               ((= (aref tiles i j 2) 2)
                (push (make-instance 'blue-potion
                                     :x (+ (/ (tile-size) 2) (* i (tile-size)))
@@ -242,7 +273,7 @@
     (make-instance 'level
                    :tiles tiles
                    :player player
-                   :entities (cons player entities)
+                   :entities (reverse (cons player entities))
                    :restart-level (lambda ()
                                     (make-level resources next-level tiles))
                    :next-level next-level)))

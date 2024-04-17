@@ -13,8 +13,7 @@
   (row-limit (atlas frame-set) (get-row frame-set)))
 
 (defclass animation ()
-  ((frame-set  :initarg :frame-set        :reader frame-set)
-   (start-tick :initform (sdl2:get-ticks) :accessor start-tick)))
+  ((frame-set  :initarg :frame-set :reader frame-set)))
 
 (defun render-animation! (renderer textures animation x y &key flip?)
   (let ((frame (get-frame animation)))
@@ -26,7 +25,7 @@
 ;;;   Just runs on repeat.
 
 (defclass frame-loop (animation)
-  ())
+  ((start-tick :initform (sdl2:get-ticks) :accessor start-tick)))
 
 (defmethod get-frame ((frame-loop frame-loop))
   (let* ((total-ticks (- (sdl2:get-ticks) (start-tick frame-loop)))
@@ -38,7 +37,7 @@
 ;;;   Runs once, then freezes
 
 (defclass one-shot (animation)
-  ())
+  ((start-tick :initform (sdl2:get-ticks) :accessor start-tick)))
 
 (defmethod get-frame ((one-shot one-shot))
   (let* ((total-ticks (- (sdl2:get-ticks) (start-tick one-shot)))
@@ -82,6 +81,14 @@
     (lambda ()
       (make-instance 'frame-loop :frame-set frame-set))))
 
+(defun freeze-animation (atlas row)
+  (let ((frame-set (make-instance 'frame-set
+                                  :atlas atlas
+                                  :row row
+                                  :ticks-per-frame most-positive-fixnum)))
+    (lambda ()
+      (make-instance 'frame-loop :frame-set frame-set))))
+
 (defun one-shot-animation (atlas row)
   (let ((frame-set (make-instance 'frame-set
                                   :atlas atlas
@@ -106,6 +113,21 @@
           ,(button-animation button-atlas :options)
           :quit
           ,(button-animation button-atlas :quit)))
+     :container
+     ,(let ((container-atlas
+              (make-atlas (get-resource '(:textures :containers) resources)
+                          (lambda (textures) (getf textures :containers))
+                          #(:box :barrel)
+                          #(8 8)
+                          :baseline-offset 1)))
+        `(:barrel
+          ,(freeze-animation container-atlas :barrel)
+          :box
+          ,(freeze-animation container-atlas :box)
+          :destroy-barrel
+          ,(one-shot-animation container-atlas :barrel)
+          :destroy-box
+          ,(one-shot-animation container-atlas :box)))
      :crabby
      ,(let ((crabby-atlas
               (make-atlas (get-resource '(:textures :crabby) resources)

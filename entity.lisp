@@ -70,6 +70,8 @@
 
 (defparameter *render-hitbox* nil)
 
+(defvar *the-barrel* nil)
+
 (defmethod render-entity! :after (renderer resources (entity hitbox))
   (when *render-hitbox*
     (sdl2:set-render-draw-color renderer #xff #x00 #x00 #xFF)
