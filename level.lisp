@@ -276,6 +276,23 @@
                                     :state :idle
                                     :animation (funcall (get-resource '(:animations :spikes :idle) resources)))
                      entities))
+              ((= (aref tiles i j 2) 5)
+               (push (make-instance 'cannon
+                                    :x (+ (/ (tile-size) 2) (* i (tile-size)))
+                                    :y (- (* (+ j 1) (tile-size)) 1)
+                                    :state :idle
+                                    :animation (funcall (get-resource '(:animations :cannon :idle) resources))
+                                    :animations (get-resource '(:animations :cannon) resources))
+                     entities))
+              ((= (aref tiles i j 2) 6)
+               (push (make-instance 'cannon
+                                    :x (+ (/ (tile-size) 2) (* i (tile-size)))
+                                    :y (- (* (+ j 1) (tile-size)) 1)
+                                    :state :idle
+                                    :flip t
+                                    :animation (funcall (get-resource '(:animations :cannon :idle) resources))
+                                    :animations (get-resource '(:animations :cannon) resources))
+                     entities))
               (t nil))))
     (make-instance 'level
                    :tiles tiles

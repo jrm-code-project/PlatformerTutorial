@@ -82,6 +82,7 @@
 (defun call-with-surfaces (receiver)
   (let-surfaces ((big-clouds-surface          (resource-pathname "big_clouds.png"))
                  (button-atlas-surface        (resource-pathname "button_atlas.png"))
+                 (cannon-surface              (resource-pathname "cannon_atlas.png"))
                  (containers-surface          (resource-pathname "objects_sprites.png"))
                  (crabby-atlas-surface        (resource-pathname "crabby_sprite.png"))
                  (health-bar-surface          (resource-pathname "health_power_bar.png"))
@@ -103,6 +104,7 @@
         (funcall receiver
                  `(:big-clouds          ,big-clouds-surface
                    :button-atlas        ,button-atlas-surface
+                   :cannon              ,cannon-surface
                    :containers          ,containers-surface
                    :crabby-atlas        ,crabby-atlas-surface
                    :game-over           ,game-over-surface

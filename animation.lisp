@@ -113,6 +113,16 @@
           ,(button-animation button-atlas :options)
           :quit
           ,(button-animation button-atlas :quit)))
+     :cannon
+     ,(let ((cannon-atlas
+              (make-atlas (get-resource '(:textures :cannon) resources)
+                          (lambda (textures) (getf textures :cannon))
+                          #(:cannon)
+                          #(7))))
+        `(:idle
+          ,(freeze-animation cannon-atlas :cannon)
+          :fire
+          ,(one-shot-animation cannon-atlas :cannon)))
      :container
      ,(let ((container-atlas
               (make-atlas (get-resource '(:textures :containers) resources)

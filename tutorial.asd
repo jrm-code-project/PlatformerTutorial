@@ -17,6 +17,10 @@
                                               "macros"
                                               "package"
                                               "parameters"))
+               (:file "cannon"   :depends-on ("entity"
+                                              "macros"
+                                              "package"
+                                              "parameters"))
                (:file "container" :depends-on ("entity"
                                                "macros"
                                                "package"
