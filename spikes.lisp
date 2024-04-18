@@ -17,4 +17,5 @@
 
 (defmethod entity-step! (game level (spikes spikes) (state (eql :idle)) dticks)
   (when (can-attack? spikes (player level))
-    (hit! (player level))))
+    (unless (member (get-state (player level)) '(:hit))
+      (hit! (player level)))))

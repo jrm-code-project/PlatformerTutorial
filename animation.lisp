@@ -118,7 +118,8 @@
               (make-atlas (get-resource '(:textures :cannon) resources)
                           (lambda (textures) (getf textures :cannon))
                           #(:cannon)
-                          #(7))))
+                          #(7)
+                          :baseline-offset 1)))
         `(:idle
           ,(freeze-animation cannon-atlas :cannon)
           :fire

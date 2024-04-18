@@ -226,3 +226,5 @@
 (defun within-five-tiles? (entity-x entity-y)
   (< (abs (- (get-x entity-x) (get-x entity-y))) (* 5 (tile-size))))
 
+(defun left-to-right? (entity-x entity-y)
+  (< (get-x entity-x) (get-x entity-y)))
