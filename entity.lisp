@@ -13,7 +13,9 @@
    (animations :initarg :animations         :reader   animations)
    (flip       :initarg :flip :initform nil :accessor flip?)))
 
-(defgeneric entity-step! (game level entity state dticks))
+(defgeneric entity-step! (game level entity state dticks)
+  (:method (game level (entity entity) state dticks)
+    nil))
 
 (defgeneric render-entity! (renderer resources entity)
   (:method (renderer resources (entity entity))

@@ -2,9 +2,9 @@
 
 (in-package "TUTORIAL")
 
-(defun-scaled spikes-attackbox-width 16)
-(defun-scaled spikes-attackbox-height 8)
-(defun-scaled spikes-attackbox-x-offset -8)
+(defun-scaled spikes-attackbox-width 32)
+(defun-scaled spikes-attackbox-height 16)
+(defun-scaled spikes-attackbox-x-offset -16)
 (defun-scaled spikes-attackbox-y-offset 0)
 
 (defclass spikes (attackbox entity)
@@ -17,4 +17,4 @@
 
 (defmethod entity-step! (game level (spikes spikes) (state (eql :idle)) dticks)
   (when (can-attack? spikes (player level))
-    (format t "~&Ouch~%")))
+    (hit! (player level))))
