@@ -69,6 +69,7 @@
                 (big-clouds-texture      (getf surfaces :big-clouds))
                 (button-atlas-texture    (getf surfaces :button-atlas))
                 (cannon-texture          (getf surfaces :cannon))
+                (cannonball-texture      (getf surfaces :cannonball))
                 (containers-texture      (getf surfaces :containers))
                 (crabby-atlas-texture    (getf surfaces :crabby-atlas))
                 (game-over-texture       (getf surfaces :game-over))
@@ -92,6 +93,7 @@
                  (:big-clouds          ,big-clouds-texture
                   :button-atlas        ,button-atlas-texture
                   :cannon              ,cannon-texture
+                  :cannonball          ,cannonball-texture
                   :containers          ,containers-texture
                   :crabby              ,crabby-atlas-texture
                   :game-over           ,game-over-texture

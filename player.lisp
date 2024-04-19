@@ -104,7 +104,8 @@
 (defmethod entity-step! (game level (player player) (state (eql :idle)) dticks)
   (let ((l/r (l/r-input)))
     (cond ((not (entity-supported? level player))
-           (setf (get-state player) :falling))
+           (setf (delta-y player) 0
+                 (get-state player) :falling))
           ((sdl2:keyboard-state-p :scancode-space)
            (setf (get-state player) :attack))
           ((sdl2:keyboard-state-p :scancode-up)

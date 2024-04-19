@@ -124,6 +124,15 @@
           ,(freeze-animation cannon-atlas :cannon)
           :fire
           ,(one-shot-animation cannon-atlas :cannon)))
+     :cannonball
+     ,(let ((cannonball-atlas
+              (make-atlas (get-resource '(:textures :cannonball) resources)
+                          (lambda (textures) (getf textures :cannonball))
+                          #(:cannonball)
+                          #(1)
+                          :baseline-offset 1)))
+        `(:idle
+          ,(freeze-animation cannonball-atlas :cannonball)))
      :container
      ,(let ((container-atlas
               (make-atlas (get-resource '(:textures :containers) resources)
