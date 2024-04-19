@@ -39,6 +39,9 @@
   ((health :initarg :initial-health :accessor get-health)))
 
 (defgeneric hit! (entity)
+  (:method ((entity entity))
+    nil)
+
   (:method ((entity health))
     (decf (get-health entity) 10)
     (if (< (get-health entity) 0)
